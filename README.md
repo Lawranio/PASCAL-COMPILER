@@ -1,4 +1,4 @@
 # NEXT TARGET
 
-* state parse
-* operation priority
+* print minus in expression like a := -3
+* close bracket

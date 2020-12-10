@@ -37,7 +37,8 @@ public:
 	void		 FreeRightNode();
 	static void  FreeTree(Tree*& t_tree);
 
-	void		 PrintTree(int iter);
+	void		 PrintTree(int tab);
+	void		 PrintTree_2();
 
 
 private:
@@ -45,6 +46,7 @@ private:
 	Tree* right;
 	Tree* parent;
 	string value;
+	int priority;
 
 	void FreeTree();
 };

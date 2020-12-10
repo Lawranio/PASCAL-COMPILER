@@ -6,6 +6,7 @@ Tree::Tree()
 	right   = nullptr;
 	parent  = nullptr;
 	value   = "";
+	priority = 0;
 }
 Tree::Tree(const string& val)
 {
@@ -13,6 +14,7 @@ Tree::Tree(const string& val)
 	right   = nullptr;
 	parent  = nullptr;
 	value   = val;
+	priority = 0;
 }
 Tree::~Tree()
 {
@@ -111,25 +113,37 @@ void Tree::FreeTree()
 }
 
 
-void Tree::PrintTree(int iter)
+void Tree::PrintTree(int tab)
 {
-	for (auto i = 0; i < iter; i++) {
+	for (auto i = 0; i < tab; i++) {
 		std::cout << "    ";
 	}
 	std::cout << this->value << std::endl;
 
-	if (this->left != nullptr) { this->left->PrintTree(iter + 1); }
+	if (this->left != nullptr) { this->left->PrintTree(tab + 1); }
 	else {
-		for (auto i = 0; i < iter + 1; i++) {
+		for (auto i = 0; i < tab + 1; i++) {
 			std::cout << "    ";
 		}
-		std::cout << "NULL" << std::endl;
+		//std::cout << "NULL" << std::endl;
+		cout << endl;
 	};
-	if (this->right != nullptr) { this->right->PrintTree(iter + 1); }
+	if (this->right != nullptr) { this->right->PrintTree(tab + 1); }
 	else {
-		for (auto i = 0; i < iter + 1; i++) {
+		for (auto i = 0; i < tab + 1; i++) {
 			std::cout << "    ";
 		}
-		std::cout << "NULL" << std::endl;
+		//std::cout << "NULL" << std::endl;
+		cout << endl;
 	}
+}
+void Tree::PrintTree_2()
+{
+	std::cout << this << "\t" << this->value
+		<< ((this->value.size() >= 4) ? "\t " : "\t\t ")
+		<< this->left
+		<< ((this->left == nullptr) ? "\t\t\t " : "\t ")
+		<< this->right << std::endl;
+	if (this->left != nullptr) this->left->PrintTree_2();
+	if (this->right != nullptr) this->right->PrintTree_2();
 }

@@ -348,8 +348,7 @@ int Syntax::expressionParse(lex_it& t_iter, Tree *tree, int& bracket_lvl) {
     }
     case constant_tk: { // like a := 3 ...
         var_iter = iter;
-        if (bracket_lvl > 0) subTree = bracketExprParse(var_iter, t_iter, tree, bracket_lvl);
-        else subTree = simplExprParse(var_iter, t_iter, tree, bracket_lvl);
+        subTree = simplExprParse(var_iter, t_iter, tree, bracket_lvl);
         break;
     }
     case minus_tk: { // like a := -3;
@@ -371,26 +370,10 @@ int Syntax::expressionParse(lex_it& t_iter, Tree *tree, int& bracket_lvl) {
         break;
     }
     case opb_tk: {
-        bracket_lvl++;
-        expressionParse(t_iter, tree, bracket_lvl);
         break;
     }
-    case cpb_tk: {
-        if (getNextLex(t_iter)->GetToken() != semi_tk) {
-            bracket_lvl--;
-            t_iter = getPrevLex(iter);
-            lex_table.erase(getNextLex(iter));
-            getPrevLex(t_iter);
-            expressionParse(t_iter, tree, bracket_lvl);
-        }
-        else {
-            bracket_lvl--;
-            var_iter = getPrevLex(iter);
-            t_iter = var_iter;
-            getNextLex(iter);
-            lex_table.erase(iter);
-            simplExprParse(var_iter, t_iter, tree, bracket_lvl);
-        }
+    case cpb_tk:
+    {
         break;
     }
     default: {
@@ -441,43 +424,6 @@ Tree* Syntax::simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree,
     return tree;
 }
 
-Tree* Syntax::bracketExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree, int& bracket_lvl) {
-    Tree* subTree;
-    auto iter = getNextLex(t_iter);
-    switch (iter->GetToken()) {
-    case plus_tk:
-    case minus_tk:
-    case mul_tk:
-    case mod_tk:
-    case div_tk: {
-        if (operations.at(iter->GetName()) <=
-            operations.at(tree->GetValue())) {       // Priority of current <=
-            tree->AddRightNode(var_iter->GetName());
-            subTree = tree->GetParentNode();
-
-            while (operations.at(iter->GetName()) <= // go through parents
-                operations.at(subTree->GetValue()))
-                subTree = subTree->GetParentNode();
-
-            subTree = createLowestOpTree(subTree, iter->GetName());
-        }
-        else { // if Priority of current >
-         /******* Create a new node of subexpression ************/
-            tree->AddRightNode(iter->GetName());            //     <oper> <- subTree
-            subTree = tree->GetRightNode();                 //      /  /
-            subTree->AddLeftNode(var_iter->GetName());      //    val  nullptr
-         /********************************************************/
-        }
-        expressionParse(t_iter, subTree, bracket_lvl);
-        break;
-    }
-    default: { // any other lexem, expression is over
-        tree->AddRightNode(var_iter->GetName());
-        break;
-    }
-    }
-    return tree;
-}
 
 void Syntax::printError(errors t_err, Lexem lex) {
     error = true;

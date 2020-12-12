@@ -26,7 +26,10 @@ private:
 	std::map<std::string, int> operations;
 
 	lex_it		getNextLex(lex_it& iter);
+	lex_it		getPrevLex(lex_it& iter);
+
 	lex_it		peekLex(int N, lex_it t_iter);
+	lex_it		peekPrevLex(int N, lex_it t_iter);
 
 
 	int						programParse(lex_it &t_iter);
@@ -38,8 +41,10 @@ private:
 	Tree*	/*int*/			stateParse(lex_it& t_iter, int c_count);
 	Tree*	/*int*/			compoundParse(lex_it& t_iter, int c_count);
 
-	int						expressionParse(lex_it& t_iter, Tree* tree);
-	Tree					*simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree);
+	int						expressionParse(lex_it& t_iter, Tree* tree, int& bracket_lvl);
+	Tree					*simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree, int& bracket_lvl);
+	Tree					*bracketExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree, int& bracket_lvl);
+
 
 	void	printError(errors t_err, Lexem lex);
 	bool	checkLexem(const lex_it& t_iter, const tokens& t_tok);

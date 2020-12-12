@@ -27,10 +27,13 @@ Syntax::Syntax(std::vector<Lexem>&& t_lex_table) {
     operations.emplace("/", 3);
     operations.emplace("div", 3);
     operations.emplace("mod", 3);
+
+    operations.emplace("(", 4);
+    operations.emplace(")", 4);
 }
 
 Syntax::~Syntax() {
-    Tree::FreeTree(root_tree); // ERROR Tree.h 129 line !!!!!!!!!!
+    Tree::FreeTree(root_tree);
 }
 
 
@@ -65,6 +68,19 @@ Syntax::lex_it Syntax::getNextLex(lex_it& iter) {
     return iter;
 }
 
+Syntax::lex_it Syntax::getPrevLex(lex_it& iter) {
+    try {
+        if (iter != lex_table.begin())
+            iter--;
+    }
+    catch (const std::exception& exp) {
+        std::cerr << "<E> Syntax: Catch exception in " << __func__ << ": "
+            << exp.what() << std::endl;
+    }
+
+    return iter;
+}
+
 Syntax::lex_it Syntax::peekLex(int N, lex_it t_iter) {
     try {
         auto iter = t_iter;
@@ -77,6 +93,22 @@ Syntax::lex_it Syntax::peekLex(int N, lex_it t_iter) {
     }
     catch (const std::exception &) {
         std::cerr << "<E> Syntax: Can't peek so forward" << std::endl;
+        return t_iter;
+    }
+}
+
+Syntax::lex_it Syntax::peekPrevLex(int N, lex_it t_iter) {
+    try {
+        auto iter = t_iter;
+        while (iter != lex_table.end()) {
+            if (N == 0) return iter;
+            iter--; N--;
+        }
+
+        return iter;
+    }
+    catch (const std::exception&) {
+        std::cerr << "<E> Syntax: Can't peek so backward" << std::endl;
         return t_iter;
     }
 }
@@ -220,7 +252,8 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
         auto *tree_exp = Tree::CreateNode(t_iter->GetName());
         tree_exp->AddLeftNode(var_iter->GetName());
 
-        expressionParse(t_iter, tree_exp);
+        auto bracket_lvl = 0;               // like a := (...(...)...)
+        expressionParse(t_iter, tree_exp, bracket_lvl);
         if (!checkLexem(t_iter, semi_tk)) { // we exit from expression on the ';'
             printError(MUST_BE_SEMI, *t_iter);
             return nullptr;
@@ -303,7 +336,7 @@ Tree* Syntax::compoundParse(lex_it& t_iter, int c_count) {
     return root_compound_tree;
 }
 
-int Syntax::expressionParse(lex_it& t_iter, Tree *tree) {
+int Syntax::expressionParse(lex_it& t_iter, Tree *tree, int& bracket_lvl) {
     lex_it var_iter;
     Tree *subTree;
 
@@ -315,30 +348,49 @@ int Syntax::expressionParse(lex_it& t_iter, Tree *tree) {
     }
     case constant_tk: { // like a := 3 ...
         var_iter = iter;
-        subTree = simplExprParse(var_iter, t_iter, tree);
+        if (bracket_lvl > 0) subTree = bracketExprParse(var_iter, t_iter, tree, bracket_lvl);
+        else subTree = simplExprParse(var_iter, t_iter, tree, bracket_lvl);
         break;
     }
     case minus_tk: { // like a := -3;
 
-        if (getNextLex(t_iter)->GetToken() != constant_tk) {
+        if (!checkLexem(peekLex(1, t_iter), constant_tk)) {
             printError(MUST_BE_ID, *t_iter);
             return -EXIT_FAILURE;
         }
 
-        var_iter = t_iter;
-        subTree = simplExprParse(var_iter, t_iter, tree);
+        var_iter = iter;
+        subTree = simplExprParse(var_iter, t_iter, tree, bracket_lvl);
+
+        subTree = tree->GetLeftNode();
+        subTree->AddRightNode(var_iter->GetName());
+
+        iter = t_iter;
+        var_iter = iter;
+        subTree = simplExprParse(var_iter, t_iter, tree, bracket_lvl);
         break;
     }
-    case cpb_tk:
-        if (checkLexem(peekLex(1, t_iter), semi_tk)) {
-            expressionParse(t_iter, tree);
+    case opb_tk: {
+        bracket_lvl++;
+        expressionParse(t_iter, tree, bracket_lvl);
+        break;
+    }
+    case cpb_tk: {
+        if (getNextLex(t_iter)->GetToken() != semi_tk) {
+            bracket_lvl--;
+            t_iter = getPrevLex(iter);
+            lex_table.erase(getNextLex(iter));
+            getPrevLex(t_iter);
+            expressionParse(t_iter, tree, bracket_lvl);
         }
         else {
-            simplExprParse(var_iter, t_iter, tree);
+            bracket_lvl--;
+            var_iter = getPrevLex(iter);
+            t_iter = var_iter;
+            getNextLex(iter);
+            lex_table.erase(iter);
+            simplExprParse(var_iter, t_iter, tree, bracket_lvl);
         }
-        break;
-    case opb_tk: { // like a := ( ... );
-        expressionParse(t_iter, tree);
         break;
     }
     default: {
@@ -350,7 +402,7 @@ int Syntax::expressionParse(lex_it& t_iter, Tree *tree) {
     return EXIT_SUCCESS;
 }
 
-Tree* Syntax::simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree)
+Tree* Syntax::simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree, int& bracket_lvl)
 {
     Tree* subTree;
     auto iter = getNextLex(t_iter);
@@ -378,7 +430,45 @@ Tree* Syntax::simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree)
             subTree->AddLeftNode(var_iter->GetName());      //    val  nullptr
          /********************************************************/
         }
-        expressionParse(t_iter, subTree);
+        expressionParse(t_iter, subTree, bracket_lvl);
+        break;
+    }
+    default: { // any other lexem, expression is over
+        tree->AddRightNode(var_iter->GetName());
+        break;
+    }
+    }
+    return tree;
+}
+
+Tree* Syntax::bracketExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree, int& bracket_lvl) {
+    Tree* subTree;
+    auto iter = getNextLex(t_iter);
+    switch (iter->GetToken()) {
+    case plus_tk:
+    case minus_tk:
+    case mul_tk:
+    case mod_tk:
+    case div_tk: {
+        if (operations.at(iter->GetName()) <=
+            operations.at(tree->GetValue())) {       // Priority of current <=
+            tree->AddRightNode(var_iter->GetName());
+            subTree = tree->GetParentNode();
+
+            while (operations.at(iter->GetName()) <= // go through parents
+                operations.at(subTree->GetValue()))
+                subTree = subTree->GetParentNode();
+
+            subTree = createLowestOpTree(subTree, iter->GetName());
+        }
+        else { // if Priority of current >
+         /******* Create a new node of subexpression ************/
+            tree->AddRightNode(iter->GetName());            //     <oper> <- subTree
+            subTree = tree->GetRightNode();                 //      /  /
+            subTree->AddLeftNode(var_iter->GetName());      //    val  nullptr
+         /********************************************************/
+        }
+        expressionParse(t_iter, subTree, bracket_lvl);
         break;
     }
     default: { // any other lexem, expression is over

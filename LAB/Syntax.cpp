@@ -252,8 +252,7 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
         auto *tree_exp = Tree::CreateNode(t_iter->GetName());
         tree_exp->AddLeftNode(var_iter->GetName());
 
-        auto bracket_lvl = 0;               // like a := (...(...)...)
-        expressionParse(t_iter, tree_exp, bracket_lvl);
+        expressionParse(t_iter, tree_exp);
         if (!checkLexem(t_iter, semi_tk)) { // we exit from expression on the ';'
             printError(MUST_BE_SEMI, *t_iter);
             return nullptr;
@@ -336,7 +335,7 @@ Tree* Syntax::compoundParse(lex_it& t_iter, int c_count) {
     return root_compound_tree;
 }
 
-int Syntax::expressionParse(lex_it& t_iter, Tree *tree, int& bracket_lvl) {
+int Syntax::expressionParse(lex_it& t_iter, Tree *tree) {
     lex_it var_iter;
     Tree *subTree;
 
@@ -348,12 +347,12 @@ int Syntax::expressionParse(lex_it& t_iter, Tree *tree, int& bracket_lvl) {
     }
     case constant_tk: { // like a := 3 ...
         var_iter = iter;
-        subTree = simplExprParse(var_iter, t_iter, tree, bracket_lvl);
+        subTree = simplExprParse(var_iter, t_iter, tree);
         break;
     }
     case minus_tk: { // like a := -3;
 
-        if (!checkLexem(peekLex(1, t_iter), constant_tk)) {
+       /* if (!checkLexem(peekLex(1, t_iter), constant_tk)) {
             printError(MUST_BE_ID, *t_iter);
             return -EXIT_FAILURE;
         }
@@ -366,14 +365,27 @@ int Syntax::expressionParse(lex_it& t_iter, Tree *tree, int& bracket_lvl) {
 
         iter = t_iter;
         var_iter = iter;
-        subTree = simplExprParse(var_iter, t_iter, tree, bracket_lvl);
+        subTree = simplExprParse(var_iter, t_iter, tree, bracket_lvl);*/
         break;
     }
     case opb_tk: {
+        expressionParse(t_iter, tree);
         break;
     }
-    case cpb_tk:
-    {
+    case cpb_tk: {
+        if (getNextLex(t_iter)->GetToken() != semi_tk) {
+            t_iter = getPrevLex(iter);
+            lex_table.erase(getNextLex(iter));
+            getPrevLex(t_iter);
+            expressionParse(t_iter, tree);
+        }
+        else {
+            var_iter = getPrevLex(iter);
+            t_iter = var_iter;
+            getNextLex(iter);
+            lex_table.erase(iter);
+            simplExprParse(var_iter, t_iter, tree);
+        }
         break;
     }
     default: {
@@ -385,7 +397,7 @@ int Syntax::expressionParse(lex_it& t_iter, Tree *tree, int& bracket_lvl) {
     return EXIT_SUCCESS;
 }
 
-Tree* Syntax::simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree, int& bracket_lvl)
+Tree* Syntax::simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree)
 {
     Tree* subTree;
     auto iter = getNextLex(t_iter);
@@ -413,16 +425,23 @@ Tree* Syntax::simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree,
             subTree->AddLeftNode(var_iter->GetName());      //    val  nullptr
          /********************************************************/
         }
-        expressionParse(t_iter, subTree, bracket_lvl);
+        expressionParse(t_iter, subTree);
         break;
     }
     default: { // any other lexem, expression is over
-        tree->AddRightNode(var_iter->GetName());
+        if (iter->GetToken() == cpb_tk) {
+            getPrevLex(t_iter);
+            expressionParse(t_iter, tree);
+        }
+        else {
+            tree->AddRightNode(var_iter->GetName());
+        }
         break;
     }
     }
     return tree;
 }
+
 
 
 void Syntax::printError(errors t_err, Lexem lex) {
@@ -469,6 +488,10 @@ void Syntax::printError(errors t_err, Lexem lex) {
     }
     case MUST_BE_DOT: {
         std::cerr << "<E> Syntax: Program must be end by '.'" << std::endl;
+        break;
+    }
+    case MUST_BE_BRACKET: {
+        std::cerr << "<E> Syntax: Missing close bracket in expression" << std::endl;
         break;
     }
                     // TODO: Add remaining error types

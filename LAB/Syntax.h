@@ -41,8 +41,8 @@ private:
 	Tree*	/*int*/			stateParse(lex_it& t_iter, int c_count);
 	Tree*	/*int*/			compoundParse(lex_it& t_iter, int c_count);
 
-	int						expressionParse(lex_it& t_iter, Tree* tree, int& bracket_lvl);
-	Tree					*simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree, int& bracket_lvl);
+	int						expressionParse(lex_it& t_iter, Tree* tree);
+	Tree					*simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree);
 
 
 	void	printError(errors t_err, Lexem lex);

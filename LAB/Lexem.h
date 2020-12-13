@@ -38,6 +38,7 @@ enum errors {
     MUST_BE_TYPE,    // Error: Must be type of identifier
     MUST_BE_DOT,     // Error: Must be '.'
     MUST_BE_ASS,     // Error: Must be ':='
+    MUST_BE_BRACKET, // Error: Must be ')' in expression
     DUPL_ID_ERR,     // Error: Duplicate declaration on identifier
     UNKNOWN_ID,      // Error: Undefined identifier
     // TODO: Add other types of error

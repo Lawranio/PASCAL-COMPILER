@@ -17,8 +17,14 @@ public:
 	explicit Tree(const string& val);
 	virtual ~Tree();
 
+	void		 SetPriority(int priority_);
+	int		     GetPriority();
+
 	void		 AddLeftNode(const string& val);
 	void		 AddRightNode(const string& val);
+
+	void		 AddLeftNode(const string& val, int priority_);
+	void		 AddRightNode(const string& val, int priority_);
 
 	void		 AddLeftTree(Tree* tree);
 	void		 AddRightTree(Tree* tree);
@@ -28,6 +34,7 @@ public:
 
 	static Tree* CreateNode(const string& val);
 	static Tree* CreateNode(Tree* parent_tree, const string& val);
+	static Tree* CreateNode(Tree* parent_tree, const string& val, int& priority_);
 
 	Tree*		 GetLeftNode();
 	Tree*		 GetRightNode();

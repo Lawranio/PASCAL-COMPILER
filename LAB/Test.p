@@ -2,5 +2,5 @@ program kekw;
 var
 a, b: integer;
 begin
-a := (7 + 3 + 23 * 2) div 20;
+a := (5 + 2 * 3) - (1 / (7 - 4));
 end. 

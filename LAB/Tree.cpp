@@ -21,6 +21,13 @@ Tree::~Tree()
 	FreeTree();
 }
 
+void Tree::SetPriority(int priority_) {
+	priority = priority_;
+}
+int	 Tree::GetPriority() {
+	return priority;
+}
+
 
 void Tree::AddLeftNode(const string& val)
 {
@@ -29,6 +36,14 @@ void Tree::AddLeftNode(const string& val)
 void Tree::AddRightNode(const string& val)
 {
 	this->right = CreateNode(this, val);
+}
+
+
+void Tree::AddLeftNode(const string& val, int priority_) {
+	this->left = CreateNode(this, val, priority_);
+}
+void Tree::AddRightNode(const string& val, int priority_) {
+	this->right = CreateNode(this, val, priority_);
 }
 
 
@@ -53,6 +68,12 @@ Tree* Tree::CreateNode(Tree* parent_tree, const string& val)
 {
 	auto* node = new Tree(val);
 	node->parent = addressof(*parent_tree);
+	return node;
+}
+Tree* Tree::CreateNode(Tree* parent_tree, const string& val, int& priority_) {
+	auto* node = new Tree(val);
+	node->parent = addressof(*parent_tree);
+	node->SetPriority(priority_);
 	return node;
 }
 

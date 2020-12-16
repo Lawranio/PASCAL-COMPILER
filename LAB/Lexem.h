@@ -12,6 +12,16 @@ enum tokens {
     type_tk,            // 'type'
     id_tk = 8,          // any [aA-zZ][0-9]
     constant_tk = 9,    // 0-9
+    arr_tk,             // 'array'
+    if_tk,              // 'if'
+    then_tk,            // 'then'
+    else_tk,            // 'else'
+    while_tk,           // 'while'
+    do_tk,              // 'do'
+    for_tk,             // 'for'
+    to_tk,              // 'to'
+    bool_false_tk,      // 'false'
+    bool_true_tk,       // 'true'
     dot_tk,             // '.'
     comma_tk,           // ','
     ddt_tk,             // ':'
@@ -21,30 +31,40 @@ enum tokens {
     plus_tk,            // '+'
     minus_tk,           // '-'
     mul_tk,             // '*'
-    div_tk,             // 'div'
-    mod_tk,             // 'mod'
+    div1_tk,            // '/'
+    div2_tk,            // 'div'
     opb_tk,             // '('
     cpb_tk,             // ')'
+    osb_tk,             // '['
+    csb_tk,             // ']'
+    or_tk,              // 'or'
+    and_tk,             // 'and'
+    xor_tk,             // 'xor'
     eof_tk              // 'end of file'
 };
 
 enum errors {
-    UNKNOWN_LEXEM,   // Unknown lexeme
-    EOF_ERR,         // End of file error
-    MUST_BE_ID,      // Error: Must be identifier
-    MUST_BE_SEMI,    // Error: Must be ';'
-    MUST_BE_PROG,    // Error: Must be 'program'
-    MUST_BE_COMMA,   // Error: Must be ','
-    MUST_BE_TYPE,    // Error: Must be type of identifier
-    MUST_BE_DOT,     // Error: Must be '.'
-    MUST_BE_ASS,     // Error: Must be ':='
-    MUST_BE_BRACKET, // Error: Must be ')' in expression
-    DUPL_ID_ERR,     // Error: Duplicate declaration on identifier
-    UNKNOWN_ID,      // Error: Undefined identifier
+    UNKNOWN_LEXEM,          // Unknown lexeme
+    EOF_ERR,                // End of file error
+    MUST_BE_ID,             // Error: Must be identifier
+    MUST_BE_SEMI,           // Error: Must be ';'
+    MUST_BE_PROG,           // Error: Must be 'program'
+    MUST_BE_COMMA,          // Error: Must be ','
+    MUST_BE_TYPE,           // Error: Must be type of identifier
+    MUST_BE_DOT,            // Error: Must be '.'
+    MUST_BE_ASS,            // Error: Must be ':='
+    MUST_BE_BRACKET,        // Error: Must be '('
+    MUST_BE_BRACKET_END,    // Error: Must be ')'
+    MUST_BE_ARRBRACKET,     // Error: Must be '['
+    MUST_BE_ARRBRACKET_END, // Error: Must be ']'
+    MUST_BE_DO,             // Error: Must be 'do'
+    MUST_BE_TO,             // Error: Must be 'to'
+    MUST_BE_THEN,           // Error: Must be 'then'
+    MUST_BE_OF,             // Error: Must be 'of'
+    DUPL_ID_ERR,            // Error: Duplicate declaration on identifier
+    UNKNOWN_ID,             // Error: Undefined identifier
     // TODO: Add other types of error
 };
-
-//typedef std::pair<std::string, tokens> lexem;
 
 class Lexem
 {

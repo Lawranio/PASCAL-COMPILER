@@ -38,11 +38,11 @@ private:
 	std::list<std::string>	vardParse(lex_it& t_iter);
 	int						vardpParse(lex_it& t_iter, Tree *t_tree);
 
-	Tree*	/*int*/			stateParse(lex_it& t_iter, int c_count);
-	Tree*	/*int*/			compoundParse(lex_it& t_iter, int c_count);
+	Tree*					stateParse(lex_it& t_iter, int c_count);
+	Tree*					compoundParse(lex_it& t_iter, int c_count);
 
-	int						expressionParse(lex_it& t_iter, Tree* tree);
-	Tree					*simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree);
+	int						expressionParse(lex_it& t_iter, Tree* tree, int t_lvl);
+	Tree					*simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree, int t_lvl);
 
 
 	void	printError(errors t_err, Lexem lex);
@@ -51,9 +51,9 @@ private:
 	void	updateVarTypes(const std::list<std::string>& t_var_list, const std::string& t_type_name);
 
 
-	void buildVarTree(const std::list<std::string>& t_var_list, Tree* t_tree);
-	void createVarTree(Tree* t_tree, Tree* t_donor_tree, int lvl);
-	Tree* createLowestOpTree(Tree* t_parent_tree, std::string value);
+	void	buildVarTree(const std::list<std::string>& t_var_list, Tree* t_tree);
+	void	createVarTree(Tree* t_tree, Tree* t_donor_tree, int lvl);
+	Tree*	createLowestOpTree(Tree* t_parent_tree, std::string value, int priority);
 
 };
 

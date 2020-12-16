@@ -1,4 +1,5 @@
-# NEXT TARGET (make this shit work)
+# LAB_03
 
-* print minus in expression like a := -3
-* bracket expressions
+* if / for / while expressions 
+* array / boolean declaration
+* and / or / xor operations 

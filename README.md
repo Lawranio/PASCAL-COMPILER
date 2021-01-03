@@ -1,7 +1,5 @@
-# LAB_03
+# Errors to solve
 
-* if / for / while expressions 
-* array / boolean declaration
-* and / or / xor operations 
-* некорректный разбор арифметических выражений;
-* SIGSEGV при некорректной вложенности программы;
+* a := e;
+  error: Must be ':=' instead ';'
+  occurs when 'a' is undefined

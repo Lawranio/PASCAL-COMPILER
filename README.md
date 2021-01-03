@@ -8,4 +8,4 @@
 
 # WHAT WAS DONE
 
-* array "var" field - vardpParse function
+* array *var* field - vardpParse function

@@ -13,6 +13,7 @@ enum tokens {
     id_tk = 8,          // any [aA-zZ][0-9]
     constant_tk = 9,    // 0-9
     arr_tk,             // 'array'
+    of_tk,              // 'of'
     if_tk,              // 'if'
     then_tk,            // 'then'
     else_tk,            // 'else'

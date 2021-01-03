@@ -1,6 +1,7 @@
-program kekw;
-var
-a, b: integer;
+program lab;
+    var
+        b: array [1.5] of integer;
+        e: integer;
 begin
-a := (5 + 2 * 3) - (1 / (7 - 4));
-end. 
+	e := 2;
+end.     

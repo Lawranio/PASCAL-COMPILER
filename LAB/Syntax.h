@@ -49,9 +49,11 @@ private:
 	bool	checkLexem(const lex_it& t_iter, const tokens& t_tok);
 	bool	isVarExist(const std::string& t_var_name);
 	void	updateVarTypes(const std::list<std::string>& t_var_list, const std::string& t_type_name);
-
+	void	updateVarTypes(const std::list<std::string>& t_var_list, const std::string& t_type_name,
+		const std::pair<int, int>& range);
 
 	void	buildVarTree(const std::list<std::string>& t_var_list, Tree* t_tree);
+	void    buildVarTree(const std::list<std::string>& t_var_list, Tree* t_tree, Tree* array_tree);
 	void	createVarTree(Tree* t_tree, Tree* t_donor_tree, int lvl);
 	Tree*	createLowestOpTree(Tree* t_parent_tree, std::string value, int priority);
 

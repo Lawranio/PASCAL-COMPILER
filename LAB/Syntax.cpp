@@ -206,11 +206,56 @@ std::list<std::string> Syntax::vardParse(lex_it& t_iter) {
 
 int Syntax::vardpParse(lex_it& t_iter, Tree *t_tree) {
     auto var_list = vardParse(t_iter);
+    auto* tree_value = Tree::CreateNode("");
+    bool isArray{ false };
+
     if (!checkLexem(t_iter, ddt_tk)) {
         printError(MUST_BE_COMMA, *t_iter);
     }
 
     auto type_iter = getNextLex(t_iter);
+
+    if (t_iter->GetToken() == arr_tk) {
+        tree_value->ChangeValue(t_iter->GetName());
+        tree_value->AddLeftNode("range");
+        getNextLex(t_iter);
+
+        if (!checkLexem(t_iter, osb_tk)) {
+            printError(MUST_BE_ARRBRACKET, *t_iter);
+        }
+
+        getNextLex(t_iter);
+
+        if (!checkLexem(t_iter, constant_tk)) {
+            printError(MUST_BE_ID, *t_iter);
+        }
+
+        tree_value->GetLeftNode()->AddLeftNode(t_iter->GetName());
+        getNextLex(t_iter);
+
+        if (!checkLexem(t_iter, dot_tk)) {
+            printError(MUST_BE_DOT, *t_iter);
+        }
+
+        getNextLex(t_iter);
+        tree_value->GetLeftNode()->AddRightNode(t_iter->GetName());
+        getNextLex(t_iter);
+
+        if (!checkLexem(t_iter, csb_tk)) {
+            printError(MUST_BE_ARRBRACKET_END, *t_iter);
+        }
+
+        getNextLex(t_iter);
+
+        if (!checkLexem(t_iter, of_tk)) {
+            printError(MUST_BE_OF, *t_iter);
+        }
+
+        type_iter = getNextLex(t_iter);
+        isArray = true;
+    }
+
+
     if (!checkLexem(t_iter, type_tk)) {
         printError(MUST_BE_TYPE, *t_iter);
     }
@@ -220,14 +265,41 @@ int Syntax::vardpParse(lex_it& t_iter, Tree *t_tree) {
         printError(MUST_BE_SEMI, *t_iter);
     }
 
-    updateVarTypes(var_list, type_iter->GetName());
-    buildVarTree(var_list, t_tree);
+    if (isArray) {
+        std::pair<int, int> range = { std::stoi(tree_value->GetLeftNode()->GetLeftNode()->GetValue()),
+                                        std::stoi(tree_value->GetLeftNode()->GetRightNode()->GetValue()) };
+        updateVarTypes(var_list, type_iter->GetName(), range);
+    }
+    else {
+        updateVarTypes(var_list, type_iter->GetName());
+    }
+
+    if (isArray) {
+        while (t_tree->GetLeftNode() != nullptr)
+            t_tree = t_tree->GetRightNode();
+        buildVarTree(var_list, t_tree, tree_value);
+    }
+    else {
+        if (t_tree->GetValue() == "var") {
+            while (t_tree->GetLeftNode() != nullptr)
+                t_tree = t_tree->GetRightNode();
+            buildVarTree(var_list, t_tree);
+        }
+        else {
+            while (t_tree->GetLeftNode() != nullptr)
+                t_tree = t_tree->GetRightNode();
+            buildVarTree(var_list, t_tree);
+        }
+        Tree::FreeTree(tree_value);
+    }
+
     
     if (checkLexem(peekLex(1, t_iter), id_tk) || checkLexem(peekLex(1, t_iter), var_tk)) {
         if (checkLexem(peekLex(1, t_iter), var_tk))
             getNextLex(t_iter);
         vardpParse(t_iter, t_tree->GetRightNode());
     } else {
+        if (t_tree->GetRightNode()->GetRightNode())
         t_tree->GetRightNode()->FreeRightNode();
     }
    
@@ -560,6 +632,16 @@ void Syntax::printError(errors t_err, Lexem lex) {
             << "' on " << lex.GetLine() << " line" << std::endl;
         break;
     }
+    case MUST_BE_TYPE: {
+        std::cerr << "<E> Syntax: Must be type instead '" << lex.GetName()
+            << "' on " << lex.GetLine() << " line" << std::endl;
+        break;
+    }
+    case MUST_BE_ASS: {
+        std::cerr << "<E> Syntax: Must be ':=' instead '" << lex.GetName()
+            << "' on " << lex.GetLine() << " line" << std::endl;
+        break;
+    }
                     // TODO: Add remaining error types
     default: {
         std::cerr << "<E> Syntax: Undefined type of error" << std::endl;
@@ -591,6 +673,22 @@ void Syntax::updateVarTypes(const std::list<std::string>& t_var_list, const std:
     }
 }
 
+void Syntax::updateVarTypes(const std::list<std::string>& t_var_list, const std::string& t_type_name,
+                                const std::pair<int, int>& range) {
+    try {
+        for (auto& el : t_var_list) {
+            id_map.at(el).type = t_type_name;
+            id_map.at(el).isarray = true;
+            id_map.at(el).range.first = range.first;
+            id_map.at(el).range.second = range.second;
+        }
+    }
+    catch (const std::exception& exp) {
+        std::cerr << "<E> Syntax: Catch exception in " << __func__ << ": "
+                  << exp.what() << std::endl;
+    }
+}
+
 void Syntax::buildVarTree(const std::list<std::string>& t_var_list, Tree* t_tree) {
     try {
         auto i = 0;
@@ -605,6 +703,25 @@ void Syntax::buildVarTree(const std::list<std::string>& t_var_list, Tree* t_tree
             << exp.what() << std::endl;
     }
 }
+
+void Syntax::buildVarTree(const std::list<std::string>& t_var_list, Tree* t_tree, Tree* array_tree) {
+    try {
+        auto i = 0;
+        
+        for (auto& el : t_var_list) {
+            auto* tmp_tree = Tree::CreateNode(el);
+            tmp_tree->AddRightTree(array_tree);
+            array_tree->AddRightNode(id_map.at(el).type, 0);
+            createVarTree(t_tree, tmp_tree, i++);
+        }
+    }
+    catch (const std::exception& exp) {
+        std::cerr << "<E> Syntax: Catch exception in " << __func__ << ": "
+                  << exp.what() << std::endl;
+    }
+}
+
+
 
 void Syntax::createVarTree(Tree* t_tree, Tree* t_donor_tree, int lvl) {
     if (lvl > 0) {

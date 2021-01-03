@@ -9,6 +9,8 @@ public:
 	~Variable() = default;
 	std::string type;
 	std::string value;
+	bool isarray{ false };
+	std::pair<int, int> range;
 };
 
 #endif // !VARIABLE_H

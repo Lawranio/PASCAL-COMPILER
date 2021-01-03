@@ -75,6 +75,7 @@ Lexem Lexer::GetLex()
             else if (lex == "integer")  { return Lexem(std::move(lex), type_tk, line); }
             else if (lex == "boolean")  { return Lexem(std::move(lex), type_tk, line); }
             else if (lex == "array")    { return Lexem(std::move(lex), arr_tk, line); }
+            else if (lex == "of")       { return Lexem(std::move(lex), of_tk, line); }
             else if (lex == "end")      { return Lexem(std::move(lex), end_tk, line); } 
             else if (lex == "div")      { return Lexem(std::move(lex), div2_tk, line); }
             else if (lex == "and")      { return Lexem(std::move(lex), and_tk, line); }

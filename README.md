@@ -1,11 +1,10 @@
-# ERRORS TO SOLVE
+# TASKS TO SOLVE
 
-# a := e;
-
-* error: Must be ':=' instead ';'
-* occurs when 'a' is undefined
-
+* if/for structures;
+* array block parse;
+* break parse;
 
 # WHAT WAS DONE
 
-* array "var" field - vardpParse function and a few supporting functions
+* array "var" field - vardpParse function and a few supporting functions;
+* boolean operations/comparison, array range, div/mod, "for struct" lexemes was added;

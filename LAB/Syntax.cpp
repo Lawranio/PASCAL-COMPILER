@@ -24,7 +24,6 @@ Syntax::Syntax(std::vector<Lexem>&& t_lex_table) {
     operations.emplace("xor", 2);
 
     operations.emplace("*", 3);
-    operations.emplace("/", 3);
     operations.emplace("div", 3);
     operations.emplace("mod", 3);
 
@@ -233,11 +232,16 @@ int Syntax::vardpParse(lex_it& t_iter, Tree *t_tree) {
         tree_value->GetLeftNode()->AddLeftNode(t_iter->GetName());
         getNextLex(t_iter);
 
-        if (!checkLexem(t_iter, dot_tk)) {
-            printError(MUST_BE_DOT, *t_iter);
+        if (!checkLexem(t_iter, dots_arr_tk)) {
+            printError(MUST_BE_DOTS_ARR, *t_iter);
         }
 
         getNextLex(t_iter);
+      
+        if (!checkLexem(t_iter, constant_tk)) {
+            printError(MUST_BE_ID, *t_iter);
+        }
+
         tree_value->GetLeftNode()->AddRightNode(t_iter->GetName());
         getNextLex(t_iter);
 
@@ -352,9 +356,6 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
         break;
     }
     case if_tk: {
-        break;
-    }
-    case while_tk: {
         break;
     }
     case for_tk: {
@@ -504,8 +505,7 @@ Tree* Syntax::simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree,
     case plus_tk:
     case minus_tk:
     case mul_tk:
-    case div1_tk:
-    case div2_tk: {
+    case div_tk: {
         if (operations.at(iter->GetName()) + t_lvl <= (tree->GetPriority())) {    // Priority of current <=
             tree->AddRightNode(var_iter->GetName());
             subTree = tree->GetParentNode();
@@ -590,6 +590,11 @@ void Syntax::printError(errors t_err, Lexem lex) {
     }
     case MUST_BE_DOT: {
         std::cerr << "<E> Syntax: Program must be end by '.'" << std::endl;
+        break;
+    }
+    case MUST_BE_DOTS_ARR: {
+        std::cerr << "<E> Syntax: Invalid array range definition, must be '..' instead '" << lex.GetName()
+            << "' on " << lex.GetLine() << " line" << std::endl;
         break;
     }
     case MUST_BE_BRACKET: {

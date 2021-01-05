@@ -1,12 +1,11 @@
 # TASKS TO SOLVE
 
 * if/for structures;
-* array block parse;
 * break parse;
 
 # WHAT WAS DONE
 
-* array "var" field - vardpParse function and a few supporting functions;
+* array
 * boolean operations/comparison, array range, div/mod, "for struct" lexemes was added;
 
 # LATEST VERSION IN LAB 3

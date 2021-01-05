@@ -1,10 +1,10 @@
 #include <iostream>
-#include "lab_01.h"
+#include "lab_02.h"
 
 
 int main() {
 	std::cout << "Ah, here we go again" << std::endl;
-	Parse_01("test.p");
+	Parse_02("test.p");
 
 	return 0;
 }

@@ -13,16 +13,19 @@ enum tokens {
     id_tk = 8,          // any [aA-zZ][0-9]
     constant_tk = 9,    // 0-9
     arr_tk,             // 'array'
+    of_tk,              // 'of'
     if_tk,              // 'if'
     then_tk,            // 'then'
     else_tk,            // 'else'
-    while_tk,           // 'while'
     do_tk,              // 'do'
     for_tk,             // 'for'
     to_tk,              // 'to'
+    downto_tk,          // 'downto'
     bool_false_tk,      // 'false'
     bool_true_tk,       // 'true'
+    break_tk,           // 'break'
     dot_tk,             // '.'
+    dots_arr_tk,        // '..'
     comma_tk,           // ','
     ddt_tk,             // ':'
     semi_tk,            // ';'
@@ -31,8 +34,7 @@ enum tokens {
     plus_tk,            // '+'
     minus_tk,           // '-'
     mul_tk,             // '*'
-    div1_tk,            // '/'
-    div2_tk,            // 'div'
+    div_tk,             // 'div'
     mod_tk,             // 'mod'
     opb_tk,             // '('
     cpb_tk,             // ')'
@@ -41,6 +43,12 @@ enum tokens {
     or_tk,              // 'or'
     and_tk,             // 'and'
     xor_tk,             // 'xor'
+    bool_eqv_tk,        // '=='
+    bool_noneqv_tk,     // '<>'
+    bool_bigger_tk,     // '>'
+    bool_less_tk,       // '<'
+    bool_bigeqv_tk,     // '>='
+    bool_leseqv_tk,     // '<='
     eof_tk              // 'end of file'
 };
 
@@ -51,8 +59,10 @@ enum errors {
     MUST_BE_SEMI,           // Error: Must be ';'
     MUST_BE_PROG,           // Error: Must be 'program'
     MUST_BE_COMMA,          // Error: Must be ','
+    MUST_BE_CONST,          // Error: Must be constant
     MUST_BE_TYPE,           // Error: Must be type of identifier
     MUST_BE_DOT,            // Error: Must be '.'
+    MUST_BE_DOTS_ARR,       // Error: Must be '..'
     MUST_BE_ASS,            // Error: Must be ':='
     MUST_BE_BRACKET,        // Error: Must be '('
     MUST_BE_BRACKET_END,    // Error: Must be ')'
@@ -64,6 +74,8 @@ enum errors {
     MUST_BE_OF,             // Error: Must be 'of'
     DUPL_ID_ERR,            // Error: Duplicate declaration on identifier
     UNKNOWN_ID,             // Error: Undefined identifier
+    INCORRECT_TYPE,         // Error: Identifier is not an array
+    INCORRECT_RANGE,        // Error: Out of array range
     // TODO: Add other types of error
 };
 

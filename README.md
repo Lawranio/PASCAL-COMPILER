@@ -8,3 +8,5 @@
 
 * array "var" field - vardpParse function and a few supporting functions;
 * boolean operations/comparison, array range, div/mod, "for struct" lexemes was added;
+
+# ACTUAL VERSION IN LAB_3

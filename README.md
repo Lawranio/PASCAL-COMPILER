@@ -2,6 +2,7 @@
 
 * if/for structures;
 * break parse;
+* сode generator
 
 # WHAT WAS DONE
 

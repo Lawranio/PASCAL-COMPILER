@@ -7,6 +7,7 @@
 # WHAT WAS DONE
 
 * array
-* boolean operations/comparison, array range, div/mod, "for struct" lexemes was added;
+* for
+* boolean operations/comparison, array range, div/mod
 
 # LATEST VERSION IN LAB 3

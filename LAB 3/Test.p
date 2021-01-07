@@ -3,7 +3,13 @@ program lab;
         b: array [1..5] of integer;
         e, a: integer;
 begin
-	e := 2 - 1 * 12;
-	b[5] := 3 * (5 - 1);
-	b[2] := 4 * (b[6] + 3);
+	for a := 1 downto 5 do
+	   e := e + a;
+	   for a := 1 to 5 do
+	      a := 1;
+	
+	b[2] := e + a - 1 * (5 + 4);
+	begin
+	   b[3] := b[4] + b[5];
+	end;
 end.           

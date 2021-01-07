@@ -377,7 +377,8 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
 
         expressionParse(t_iter, tree_exp, 0);
 
-        if (!checkLexem(t_iter, semi_tk)) { // we exit from expression on the ';'
+        if (!checkLexem(t_iter, semi_tk) && (checkLexem(peekLex(1, t_iter), to_tk))
+                                         && (checkLexem(peekLex(1, t_iter), downto_tk))) { // we exit from expression on the ';'
             printError(MUST_BE_SEMI, *t_iter);
             return nullptr;
         }
@@ -404,9 +405,40 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
         break;
     }
     case for_tk: {
+        auto* tree_exp = Tree::CreateNode(t_iter->GetName());
+        result_tree = tree_exp;
+        auto for_lvl = 0;   //for in for...
+        auto left_node = stateParse(t_iter, 0);
+
+        if ((!checkLexem(t_iter, to_tk)) && (!checkLexem(t_iter, downto_tk))) {
+            printError(MUST_BE_TO, *t_iter);
+            return nullptr;
+        }
+
+        auto* tree_to = Tree::CreateNode(t_iter->GetName());
+        tree_to->AddLeftTree(left_node);
+        tree_exp->AddLeftTree(tree_to);
+
+        expressionParse(t_iter, tree_exp->GetLeftNode(), for_lvl);
+
+        if (t_iter->GetToken() != do_tk) {
+            printError(MUST_BE_DO, *t_iter);
+            return nullptr;
+        }
+
+        auto var_iter = getNextLex(t_iter);
+
+        if ((var_iter->GetToken() != id_tk) && (var_iter->GetToken() != begin_tk)) {
+            printError(MUST_BE_ID, *t_iter);
+            return nullptr;
+        }
+
+        var_iter = getPrevLex(var_iter);
+        result_tree->AddRightTree(stateParse(var_iter, c_count));
+        t_iter = var_iter;
+
         break;
     }
-    // TODO: Add if/while/for statements
     default: {
         break;
     }

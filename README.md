@@ -3,6 +3,7 @@
 * if structures;
 * break parse;
 * сode generator
+  * var declaration
 
 # WHAT WAS DONE
 

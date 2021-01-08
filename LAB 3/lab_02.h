@@ -8,8 +8,9 @@
 #include <vector>
 #include "Lexer.h"
 #include "Syntax.h"
+#include "GenCode.h"
 
-/**
+/*
  * Given grammar:
  * <Soft>			::= program <id> ; <block> .
  * <block>			::= <var part> <state part>

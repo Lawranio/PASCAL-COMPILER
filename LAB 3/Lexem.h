@@ -59,7 +59,6 @@ enum errors {
     MUST_BE_SEMI,           // Error: Must be ';'
     MUST_BE_PROG,           // Error: Must be 'program'
     MUST_BE_COMMA,          // Error: Must be ','
-    MUST_BE_CONST,          // Error: Must be constant
     MUST_BE_TYPE,           // Error: Must be type of identifier
     MUST_BE_DOT,            // Error: Must be '.'
     MUST_BE_DOTS_ARR,       // Error: Must be '..'
@@ -74,8 +73,6 @@ enum errors {
     MUST_BE_OF,             // Error: Must be 'of'
     DUPL_ID_ERR,            // Error: Duplicate declaration on identifier
     UNKNOWN_ID,             // Error: Undefined identifier
-    INCORRECT_TYPE,         // Error: Identifier is not an array
-    INCORRECT_RANGE,        // Error: Out of array range
     // TODO: Add other types of error
 };
 

@@ -13,7 +13,7 @@
 class Syntax {
 public:
 	explicit Syntax(std::vector<Lexem> &&t_lex_table);
-	int ParseCode(); // start fuction of code parsing 
+	Tree* ParseCode(); // start fuction of code parsing 
 	~Syntax();
 private:
 	using lex_it = std::vector<Lexem>::iterator;
@@ -43,7 +43,6 @@ private:
 
 	int						expressionParse(lex_it& t_iter, Tree* tree, int t_lvl);
 	Tree					*simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree, int t_lvl);
-	Tree					*simplExprParse(Tree* var_tree, lex_it& t_iter, Tree* tree, int t_lvl);
 
 
 	void	printError(errors t_err, Lexem lex);

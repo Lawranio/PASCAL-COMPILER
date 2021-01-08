@@ -90,6 +90,8 @@ Lexem Lexer::GetLex()
             else if (lex == "false")    { return Lexem(std::move(lex), bool_false_tk, line); }
             else if (lex == "true")     { return Lexem(std::move(lex), bool_true_tk, line); }
             else if (lex == "break")    { return Lexem(std::move(lex), break_tk, line); }
+            else if (lex == "then")     { return Lexem(std::move(lex), then_tk, line); }
+            else if (lex == "else")     { return Lexem(std::move(lex), else_tk, line); }
             else { // it is ID
                 return Lexem(std::move(lex), id_tk, line);                                  
             } 
@@ -141,34 +143,34 @@ Lexem Lexer::GetLex()
                 ch = GetChar();
                 if (ch == '=') {
                     lex += ch;
-                    tok = bool_eqv_tk;
+                    tok = comp_tk;
                 }
             }
 
             // '>='
-            if (tok == bool_bigger_tk) {
+            if (tok == comp_tk) {
                 ch = GetChar();
                 if (ch == '=') {
                     lex += ch;
-                    tok = bool_bigeqv_tk;
+                    tok = comp_tk;
                 }
             }
 
             // '<='
-            if (tok == bool_less_tk) {
+            if (tok == comp_tk) {
                 ch = GetChar();
                 if (ch == '=') {
                     lex += ch;
-                    tok = bool_leseqv_tk;
+                    tok = comp_tk;
                 }
             }
 
             // '<>'
-            if (tok == bool_less_tk) {
+            if (tok == comp_tk) {
                 ch = GetChar();
                 if (ch == '>') {
                     lex += ch;
-                    tok = bool_noneqv_tk;
+                    tok = comp_tk;
                 }
             }
 

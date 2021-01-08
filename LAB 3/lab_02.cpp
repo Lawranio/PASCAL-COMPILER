@@ -14,9 +14,8 @@ int Parse_02(const std::string& file_path) {
 		return -EXIT_FAILURE;
 	}
 
-	GenCode gencod(std::move(*tree));
-	gencod.GenerateAsm();
-
+	//GenCode gencod(std::move(*tree));
+	//gencod.GenerateAsm();
 
 	return EXIT_SUCCESS;
 }

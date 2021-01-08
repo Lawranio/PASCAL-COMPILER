@@ -49,6 +49,7 @@ enum tokens {
     bool_less_tk,       // '<'
     bool_bigeqv_tk,     // '>='
     bool_leseqv_tk,     // '<='
+    comp_tk,            // 'comparison signs'
     eof_tk              // 'end of file'
 };
 
@@ -59,6 +60,8 @@ enum errors {
     MUST_BE_SEMI,           // Error: Must be ';'
     MUST_BE_PROG,           // Error: Must be 'program'
     MUST_BE_COMMA,          // Error: Must be ','
+    MUST_BE_CONST,          // Error: Must be constant
+    MUST_BE_COMP,           // Error: Must be comparison sign
     MUST_BE_TYPE,           // Error: Must be type of identifier
     MUST_BE_DOT,            // Error: Must be '.'
     MUST_BE_DOTS_ARR,       // Error: Must be '..'
@@ -73,6 +76,8 @@ enum errors {
     MUST_BE_OF,             // Error: Must be 'of'
     DUPL_ID_ERR,            // Error: Duplicate declaration on identifier
     UNKNOWN_ID,             // Error: Undefined identifier
+    INCORRECT_TYPE,         // Error: Identifier is not an array
+    INCORRECT_RANGE,        // Error: Out of array range
     // TODO: Add other types of error
 };
 

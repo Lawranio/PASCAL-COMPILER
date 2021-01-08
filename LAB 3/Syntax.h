@@ -43,6 +43,7 @@ private:
 
 	int						expressionParse(lex_it& t_iter, Tree* tree, int t_lvl);
 	Tree					*simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree, int t_lvl);
+	Tree					*simplExprParse(Tree* var_tree, lex_it& t_iter, Tree* tree, int t_lvl);
 
 
 	void	printError(errors t_err, Lexem lex);

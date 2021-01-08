@@ -13,7 +13,7 @@
 class Syntax {
 public:
 	explicit Syntax(std::vector<Lexem> &&t_lex_table);
-	int ParseCode(); // start fuction of code parsing 
+	Tree* ParseCode(); // start fuction of code parsing 
 	~Syntax();
 private:
 	using lex_it = std::vector<Lexem>::iterator;

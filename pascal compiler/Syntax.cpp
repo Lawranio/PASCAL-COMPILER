@@ -36,11 +36,11 @@ Syntax::~Syntax() {
 }
 
 
-int Syntax::ParseCode() {
+Tree* Syntax::ParseCode() {
     std::cout << "Code contains " << lex_table.size() << " lexemes" << std::endl;
     auto& it = cursor;
     if (programParse(it) != 0)
-        return -EXIT_FAILURE;
+        return nullptr;
 
     while (it != lex_table.end() && it->GetToken() != eof_tk)
         blockParse(it);
@@ -55,7 +55,7 @@ int Syntax::ParseCode() {
     
     std::cout << "EOF" << std::endl;
 
-    return EXIT_SUCCESS;
+    return root_tree;
 }
 
 Syntax::lex_it Syntax::getNextLex(lex_it& iter) {

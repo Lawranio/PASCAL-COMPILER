@@ -1,14 +1,14 @@
 #include "Lexer.h"
 
 Lexer::Lexer(const char* file_path) {
-	try {
-		code.open(file_path);
-	}
-	catch (const std::exception& exp) {
-		std::string lel(exp.what());
-		std::string what = "<E> Lexer: Catch exception in constructor:";
-		throw std::runtime_error(what + lel);
-	}
+    try {
+        code.open(file_path);
+    }
+    catch (const std::exception& exp) {
+        std::string lel(exp.what());
+        std::string what = "<E> Lexer: Catch exception in constructor:";
+        throw std::runtime_error(what + lel);
+    }
 }
 
 std::vector<Lexem> Lexer::ScanCode()
@@ -32,7 +32,7 @@ std::vector<Lexem> Lexer::ScanCode()
 }
 
 Lexer::~Lexer() {
-	code.close();
+    code.close();
 }
 
 Lexem Lexer::GetLex()
@@ -69,14 +69,14 @@ Lexem Lexer::GetLex()
                 ch = GetChar();
             }
 
-            if (lex == "program")       { return Lexem(std::move(lex), program_tk, line); }   
-            else if (lex == "var")      { return Lexem(std::move(lex), var_tk, line); }     
-            else if (lex == "begin")    { return Lexem(std::move(lex), begin_tk, line); }  
+            if (lex == "program")       { return Lexem(std::move(lex), program_tk, line); }
+            else if (lex == "var")      { return Lexem(std::move(lex), var_tk, line); }
+            else if (lex == "begin")    { return Lexem(std::move(lex), begin_tk, line); }
             else if (lex == "integer")  { return Lexem(std::move(lex), type_tk, line); }
             else if (lex == "boolean")  { return Lexem(std::move(lex), type_tk, line); }
             else if (lex == "array")    { return Lexem(std::move(lex), arr_tk, line); }
             else if (lex == "of")       { return Lexem(std::move(lex), of_tk, line); }
-            else if (lex == "end")      { return Lexem(std::move(lex), end_tk, line); } 
+            else if (lex == "end")      { return Lexem(std::move(lex), end_tk, line); }
             else if (lex == "div")      { return Lexem(std::move(lex), div_tk, line); }
             else if (lex == "mod")      { return Lexem(std::move(lex), mod_tk, line); }
             else if (lex == "and")      { return Lexem(std::move(lex), and_tk, line); }
@@ -93,8 +93,8 @@ Lexem Lexer::GetLex()
             else if (lex == "then")     { return Lexem(std::move(lex), then_tk, line); }
             else if (lex == "else")     { return Lexem(std::move(lex), else_tk, line); }
             else { // it is ID
-                return Lexem(std::move(lex), id_tk, line);                                  
-            } 
+                return Lexem(std::move(lex), id_tk, line);
+            }
         }
         else if (std::ispunct(static_cast<unsigned char>(ch))) { // Other symbols
             tokens tok{ unknown_tk };
@@ -143,65 +143,65 @@ Lexem Lexer::GetLex()
                 ch = GetChar();
                 if (ch == '=') {
                     lex += ch;
-                    tok = comp_tk;
+                    tok = bool_eqv_tk;
                 }
             }
 
             // '>='
-            if (tok == comp_tk) {
+            if (tok == bool_bigger_tk) {
                 ch = GetChar();
                 if (ch == '=') {
                     lex += ch;
-                    tok = comp_tk;
+                    tok = bool_bigeqv_tk;
                 }
             }
 
             // '<='
-            if (tok == comp_tk) {
+            if (tok == bool_less_tk) {
                 ch = GetChar();
                 if (ch == '=') {
                     lex += ch;
-                    tok = comp_tk;
+                    tok = bool_leseqv_tk;
                 }
             }
 
             // '<>'
-            if (tok == comp_tk) {
+            if (tok == bool_less_tk) {
                 ch = GetChar();
                 if (ch == '>') {
                     lex += ch;
-                    tok = comp_tk;
+                    tok = bool_noneqv_tk;
                 }
             }
 
             GetChar(); // some kind of k o s t y l; here we look on \n
-            return Lexem(std::move(lex), tok, line); 
+            return Lexem(std::move(lex), tok, line);
         }
         else {
             std::cerr << "<E> Unknown token " << ch << std::endl;
         }
 
-        return Lexem(std::move(""), unknown_tk, line); 
+        return Lexem(std::move(""), unknown_tk, line);
     }
     catch (const std::exception&) {
-        return Lexem(std::move(""), unknown_tk, line); 
+        return Lexem(std::move(""), unknown_tk, line);
     }
 }
 
 char Lexer::GetChar()
 {
-	if (code.fail()) {
-		std::cerr << "<E> Can't read from the file" << std::endl;
-		throw std::runtime_error("File doesn't available");
-	}
+    if (code.fail()) {
+        std::cerr << "<E> Can't read from the file" << std::endl;
+        throw std::runtime_error("File doesn't available");
+    }
 
-	if (!code.eof()) {
-		code >> std::noskipws >> cursor;
-	}
-	else {
-		std::cerr << "<E> File is EOF early" << std::endl;
-		throw std::runtime_error("File is EOF early");
-	}
+    if (!code.eof()) {
+        code >> std::noskipws >> cursor;
+    }
+    else {
+        std::cerr << "<E> File is EOF early" << std::endl;
+        throw std::runtime_error("File is EOF early");
+    }
 
-	return cursor;
+    return cursor;
 }

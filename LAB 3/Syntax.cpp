@@ -403,9 +403,9 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
     }
     case if_tk: {
         auto* tree_exp = Tree::CreateNode(t_iter->GetName());
-        auto if_lvl = 0;    //if in if...
+        auto t_lvl = 0;    //if in if...
 
-        expressionParse(t_iter, tree_exp, if_lvl);
+        expressionParse(t_iter, tree_exp, t_lvl);
 
         if (tree_exp->GetRightNode() == nullptr) { return nullptr; };
 
@@ -435,10 +435,10 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
             || (var_iter->GetToken() == for_tk) || (var_iter->GetToken() == if_tk)) {
             var_iter = getPrevLex(var_iter);
             result_tree->GetRightNode()->AddLeftTree(stateParse(var_iter, c_count));
-            var_iter->GetName();
+            //var_iter->GetName();
         }
 
-        if (var_iter->GetToken() == else_tk) {
+        if (var_iter->GetToken() == else_tk || getNextLex(var_iter)->GetToken() == else_tk) {
             then_exp->AddRightNode("else");
             getNextLex(var_iter);
             if ((var_iter->GetToken() == id_tk) || (var_iter->GetToken() == begin_tk)
@@ -454,7 +454,7 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
     case for_tk: {
         auto* tree_exp = Tree::CreateNode(t_iter->GetName());
         result_tree = tree_exp;
-        auto for_lvl = 0;   //for in for...
+        auto t_lvl = 0;   //for in for...
         auto left_node = stateParse(t_iter, 0);
 
         if ((!checkLexem(t_iter, to_tk)) && (!checkLexem(t_iter, downto_tk))) {
@@ -466,7 +466,7 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
         tree_to->AddLeftTree(left_node);
         tree_exp->AddLeftTree(tree_to);
 
-        expressionParse(t_iter, tree_exp->GetLeftNode(), for_lvl);
+        expressionParse(t_iter, tree_exp->GetLeftNode(), t_lvl);
 
         if (t_iter->GetToken() != do_tk) {
             printError(MUST_BE_DO, *t_iter);
@@ -494,7 +494,6 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
 }
 
 Tree* Syntax::compoundParse(lex_it& t_iter, int c_count) {
-    //static int compound_count = 0; 
     c_count++;
     int local_lvl = c_count; // save current compound level
     int sec_prm = 0;
@@ -609,6 +608,10 @@ int Syntax::expressionParse(lex_it& t_iter, Tree *tree, int t_lvl) {
             t_iter = getPrevLex(iter);
             lex_table.erase(getNextLex(iter));
             getPrevLex(t_iter);
+            if (getPrevLex(t_iter)->GetToken() == osb_tk) {
+                getPrevLex(t_iter);
+                getPrevLex(t_iter);
+            }
             expressionParse(t_iter, tree, t_lvl);
         }
         else {
@@ -653,7 +656,12 @@ Tree* Syntax::simplExprParse(const lex_it& var_iter, lex_it& t_iter, Tree* tree,
     case minus_tk:
     case mul_tk:
     case div_tk:
-    case bool_bigger_tk: {
+    case bool_eqv_tk:
+    case bool_noneqv_tk:
+    case bool_bigger_tk:
+    case bool_less_tk:
+    case bool_bigeqv_tk:
+    case bool_leseqv_tk:{
         if (operations.at(iter->GetName()) + t_lvl <= (tree->GetPriority())) {    // Priority of current <=
             tree->AddRightNode(var_iter->GetName());
             subTree = tree->GetParentNode();

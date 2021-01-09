@@ -1,11 +1,11 @@
 program lab;
     var
-        b: array [1..5] of integer;
+        b: array [1..15] of integer;
         e, a: integer;
 begin
-	if 6 > 2 then
-	   begin
-	      if a > e then b[2] := 8;
-	   end;
-	else e := 7 + 1;
+	if a > e then
+		begin
+   			b[2] := 5;
+		end;
+ 	else e := 0;
 end.            

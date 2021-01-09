@@ -20,17 +20,9 @@ GenCode::GenCode(Tree &&t_synt_tree) {
 GenCode::~GenCode() {
     code.close();
     clearBuffer();
-    Tree::FreeTree(synt_tree);
 }
 
 
-/**
- * @brief Generate GAS code by syntax tree of program
- * @param none
- *
- * @return  EXIT_SUCCESS - if code was generated successful
- * @return -EXIT_FAILURE - if can't generate code
- */
 int GenCode::GenerateAsm() {
     try {
         if (synt_tree->GetLeftNode()  == nullptr && synt_tree->GetRightNode() == nullptr) {
@@ -40,9 +32,9 @@ int GenCode::GenerateAsm() {
 
         if (synt_tree->GetLeftNode() != nullptr)
             generateDeclVars();
-        if (synt_tree->GetRightNode() != nullptr) {
+
+        if (synt_tree->GetRightNode() != nullptr)
             generateTextPart();
-        }
 
         generateEnd();
         return EXIT_SUCCESS;
@@ -54,73 +46,51 @@ int GenCode::GenerateAsm() {
 }
 
 
-/**
- * @brief Add GAS construction in the file with assembler code
- * @param[in] code_line - line of GAS code
- *
- * @return none
- */
 void GenCode::addLine(std::string &&code_line) {
     code << code_line << std::endl;
 }
 
 
-/**
- * @brief Add GAS construction in the stream buffer
- * @param[in] code_line - line of GAS code
- *
- * @return none
- * @note Then use this buffer for writing in the file with assembler code
- */
 void GenCode::buildLine(std::string &&code_line) {
     test_str << code_line << std::endl;
 }
 
 
-/**
- * @brief Generate variables declaration
- * @param none
- *
- * @return  EXIT_SUCCESS - generate was successful
- * @return -EXIT_FAILURE - can't generate GAS code
- */
 int GenCode::generateDeclVars() {
-    if (synt_tree->GetLeftNode()->GetValue() != "var") {
+
+    auto treeptr = synt_tree->GetLeftNode(); 
+
+    if (treeptr->GetValue() != "var") {
         std::cerr << "<E> GenCode: Can't find declaration of variables" << std::endl;
         return -EXIT_FAILURE;
     }
 
-        generateInitVars(synt_tree->GetLeftNode());
-        if (!test_str.str().empty()) { // if we have any initialized variables
-            addLine(DATA_SECT);
-            addLine(test_str.str());
-            clearBuffer();
+    while (treeptr->GetRightNode() != nullptr) {
+        if (treeptr->GetLeftNode()->GetLeftNode() != nullptr) { // var init check
+            generateDataVar(treeptr->GetLeftNode());
+
+            if (!test_str.str().empty()) { // if we have any initialized variables
+                addLine(DATA_SECT);
+                addLine(test_str.str());
+                clearBuffer();
+            }
+        }
+        else {
+            generateBssVaar(treeptr->GetLeftNode());
+
+
+            if (!test_str.str().empty()) { // if we have any uninitialized variables
+                addLine(BSS_SECT);
+                addLine(test_str.str());
+                clearBuffer();
+            }
         }
 
-        generateUninitVars(synt_tree->GetLeftNode());
-        if (!test_str.str().empty()) { // if we have any uninitialized variables
-            addLine(BSS_SECT);
-            addLine(test_str.str());
-            clearBuffer();
-        }
-
-    generateConstVars(synt_tree->GetLeftNode());
-
+        treeptr = treeptr->GetRightNode();
+    }
     return EXIT_SUCCESS;
 }
 
-
-/**
- * @brief Generate GAS code for initialized variables
- * @param[inout] var_root - pointer to the root of subtree of variables
- *
- * @return  EXIT_SUCCESS - section of .data generated successful
- * @return -EXIT_FAILURE - can't generate .data section, can't find variables
- * @note Work for code like:
- *   var a : integer = 5;
- *       b : integer = 1;
- *       c : boolean = false;
- */
 int GenCode::generateInitVars(Tree *var_root) {
     if (var_root->GetLeftNode() == nullptr) {
         std::cerr << "<E> GenCode: Can't find any variables" << std::endl;
@@ -260,6 +230,8 @@ void GenCode::generateTextPart() {
     addLine(TEXT_SECT);
     addLine(GLOB_SECT);
     addLine(MAIN_SECT);
+    addLine(EAX_ZERO);
+    addLine(EBX_ZERO);
 
     generateCompound();
 }

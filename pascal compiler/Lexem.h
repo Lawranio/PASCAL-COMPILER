@@ -35,7 +35,6 @@ enum tokens {
     minus_tk,           // '-'
     mul_tk,             // '*'
     div_tk,             // 'div'
-    mod_tk,             // 'mod'
     opb_tk,             // '('
     cpb_tk,             // ')'
     osb_tk,             // '['
@@ -49,6 +48,7 @@ enum tokens {
     bool_less_tk,       // '<'
     bool_bigeqv_tk,     // '>='
     bool_leseqv_tk,     // '<='
+    comp_tk,            // 'comparison signs'
     eof_tk              // 'end of file'
 };
 
@@ -60,6 +60,7 @@ enum errors {
     MUST_BE_PROG,           // Error: Must be 'program'
     MUST_BE_COMMA,          // Error: Must be ','
     MUST_BE_CONST,          // Error: Must be constant
+    MUST_BE_COMP,           // Error: Must be comparison sign
     MUST_BE_TYPE,           // Error: Must be type of identifier
     MUST_BE_DOT,            // Error: Must be '.'
     MUST_BE_DOTS_ARR,       // Error: Must be '..'

@@ -31,6 +31,9 @@ private:
     static constexpr const char* MAIN_SECT = "main:";
     static constexpr const char* RET_SECT  = "ret";
 
+    static constexpr const char* EAX_ZERO = "xor1 %eax %eax";
+    static constexpr const char* EBX_ZERO = "xor1 %ebx %ebx";
+
     static constexpr const char* BYTE_TYPE = ".byte ";
     static constexpr const char* LONG_TYPE = ".long ";
     static constexpr const char* SPAC_TYPE = ".space ";
@@ -62,9 +65,9 @@ private:
     std::string getSpec(Tree *node);
     std::string getArraySize(Tree *spec_node, std::string type);
 
-    bool checkType(const std::string &type);
-    bool checkSpec(const std::string &spec);
-    void clearBuffer();
+    bool  checkType(const std::string &type);
+    bool  checkSpec(const std::string &spec);
+    void  clearBuffer();
 };
 
 

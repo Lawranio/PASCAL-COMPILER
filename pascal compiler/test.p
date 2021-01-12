@@ -1,9 +1,12 @@
 program kekw;
 var
-a: integer;
+a, b: integer;
 e: integer;
 var
 c : boolean;
 begin
-a := 3;
+a:= 1;
+b:= a + 2;
+e:= b - a;
+
 end.   

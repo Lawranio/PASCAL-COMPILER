@@ -1,7 +1,6 @@
 # TASKS TO SOLVE
 
 * if in if
-* break parse;
 * сode generator
   * var declaration
 

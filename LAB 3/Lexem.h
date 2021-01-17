@@ -35,7 +35,6 @@ enum tokens {
     minus_tk,           // '-'
     mul_tk,             // '*'
     div_tk,             // 'div'
-    mod_tk,             // 'mod'
     opb_tk,             // '('
     cpb_tk,             // ')'
     osb_tk,             // '['

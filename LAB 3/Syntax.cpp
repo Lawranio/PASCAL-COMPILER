@@ -25,7 +25,6 @@ Syntax::Syntax(std::vector<Lexem>&& t_lex_table) {
 
     operations.emplace("*", 3);
     operations.emplace("div", 3);
-    operations.emplace("mod", 3);
 
     operations.emplace("(", 4);
     operations.emplace(")", 4);
@@ -271,7 +270,7 @@ int Syntax::vardpParse(lex_it& t_iter, Tree *t_tree) {
     if (!checkLexem(t_iter, semi_tk)) {
         printError(MUST_BE_SEMI, *t_iter);
     }
-
+    
     if (isArray) {
         std::pair<int, int> range = { std::stoi(tree_value->GetLeftNode()->GetLeftNode()->GetValue()),
                                         std::stoi(tree_value->GetLeftNode()->GetRightNode()->GetValue()) };
@@ -307,7 +306,7 @@ int Syntax::vardpParse(lex_it& t_iter, Tree *t_tree) {
         vardpParse(t_iter, t_tree->GetRightNode());
     } else {
         if (t_tree->GetRightNode()->GetRightNode())
-        t_tree->GetRightNode()->FreeRightNode();
+            t_tree->GetRightNode()->FreeRightNode();
     }
    
     return EXIT_SUCCESS;
@@ -431,16 +430,28 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
         auto var_iter = getNextLex(t_iter);
         result_tree = tree_exp;
 
+        if (var_iter->GetToken() == break_tk) {
+            then_exp->AddLeftNode("break");
+            then_exp->GetLeftNode()->AddRightNode(breakpoint);
+            getNextLex(var_iter);
+        }
+
         if ((var_iter->GetToken() == id_tk) || (var_iter->GetToken() == begin_tk)
             || (var_iter->GetToken() == for_tk) || (var_iter->GetToken() == if_tk)) {
             var_iter = getPrevLex(var_iter);
             result_tree->GetRightNode()->AddLeftTree(stateParse(var_iter, c_count));
-            //var_iter->GetName();
         }
+
 
         if (var_iter->GetToken() == else_tk || getNextLex(var_iter)->GetToken() == else_tk) {
             then_exp->AddRightNode("else");
             getNextLex(var_iter);
+
+            if (var_iter->GetToken() == break_tk) {
+                then_exp->GetRightNode()->AddLeftNode("break");
+                then_exp->GetRightNode()->GetLeftNode()->AddRightNode(breakpoint);
+            }
+
             if ((var_iter->GetToken() == id_tk) || (var_iter->GetToken() == begin_tk)
                 || (var_iter->GetToken() == for_tk) || (var_iter->GetToken() == if_tk)) {
                 var_iter = getPrevLex(var_iter);
@@ -518,6 +529,7 @@ Tree* Syntax::compoundParse(lex_it& t_iter, int c_count) {
         }
         if (t_iter->GetToken() != dot_tk)
         {
+            if (checkLexem(peekLex(1, t_iter), for_tk)) { breakpoint = label(); };
             auto *subTree = stateParse(t_iter, c_count);
             if (subTree != nullptr) {
                 tree->AddRightNode(label());

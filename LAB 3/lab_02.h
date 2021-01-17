@@ -36,13 +36,12 @@
  * <or>				::= <exp> or <exp>
  * <and>			::= <exp> and <exp>
  * <xor>			::= <exp> xor <exp>
- * <arith_exp>		::= <add> | <sub> | <mul> | <div> | <mod>
+ * <arith_exp>		::= <add> | <sub> | <mul> | <div> 
  * <add>			::= <exp> + <exp>
  * <sub>			::= <exp> - <exp>
  * <mul>			::= <exp> * <exp>
  * <div>			::= <exp> div <exp>
- * <mod>			::= <exp> mod <exp>
- * <type>			::= integer
+ * <type>			::= integer | boolean
  * <id>				::= a-z
  * <constant>		::= 0-9
  */

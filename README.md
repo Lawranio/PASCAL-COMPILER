@@ -4,8 +4,8 @@
   * if in if (optional)
 * сode generator
   * ~~array decl~~
-  * for 
+  * ~~for~~, for in for  
   * break
-  * array expressions
+  * ~~array expressions~~
 
 # LATEST VERSION IN LAB 3

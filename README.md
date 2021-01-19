@@ -1,13 +1,11 @@
 # TASKS TO SOLVE
 
-* if in if
+* parser
+  * if in if (optional)
 * сode generator
-  * var declaration
-
-# WHAT WAS DONE
-
-* array
-* for
-* boolean operations/comparison, array range, div/mod
+  * array decl
+  * for 
+  * break
+  * array expressions
 
 # LATEST VERSION IN LAB 3

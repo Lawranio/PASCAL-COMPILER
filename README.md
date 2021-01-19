@@ -3,7 +3,7 @@
 * parser
   * if in if (optional)
 * сode generator
-  * array decl *+
+  * ~~array decl~~
   * for 
   * break
   * array expressions

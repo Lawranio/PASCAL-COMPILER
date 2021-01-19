@@ -1,12 +1,10 @@
 program kekw;
 var
 a, b: integer;
-e: integer;
-var
-c : boolean;
+x : array [0..9] of integer;
 begin
-a:= 1;
-b:= a + 2;
-e:= b - a;
-
+a := 1;
+x[9] := 5;
+x[4] := 2 + 5;
+b := 5 * x[5] - x[9] + 3 div a; 
 end.   

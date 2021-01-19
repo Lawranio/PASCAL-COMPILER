@@ -5,40 +5,57 @@ a: .space 4
 b: .space 4
 
 .bss
-e: .space 4
-
-.bss
-c: .space 1
+x: .space 40
 
 .text
 .global _main
  
 _main:
  
-xor1 %eax, %eax
-xor1 %ebx, %ebx
+xorl %eax, %eax
+xorl %ebx, %ebx
  
 _*op1.0:
  
 movl $1, a
 _*op1.1:
  
-pushl aa
-movl $2, %ebx
+movl $5, x + 36
+_*op1.2:
+ 
+pushl $2
+movl $5, %ebx
+popl %eax
+addl %ebx, %eax
+pushl %eax
+popl %eax
+movl %eax, x + 16
+_*op1.3:
+ 
+pushl $5
+pushl x + 20
+popl %ebx
+popl %eax
+xorl %edx, %edx
+mull  %ebx
+pushl %eax
+pushl x + 36
+popl %ebx
+popl %eax
+subl  %ebx, %eax
+pushl %eax
+pushl $3
+movl a, %ebx
+popl %eax
+xorl %edx, %edx
+divl  %ebx
+pushl %eax
+popl %ebx
 popl %eax
 addl %ebx, %eax
 pushl %eax
 popl %eax
 movl %eax, b
-_*op1.2:
- 
-pushl bb
-movl a, %ebx
-popl %eax
-subl  %ebx, %eax
-pushl %eax
-popl %eax
-movl %eax, e
  
 leave
 ret

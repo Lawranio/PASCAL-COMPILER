@@ -32,8 +32,8 @@ private:
     static constexpr const char* MAIN_SECT = "_main:";
     static constexpr const char* RET_SECT = "ret";
 
-    static constexpr const char* EAX_ZERO = "xor1 %eax, %eax";
-    static constexpr const char* EBX_ZERO = "xor1 %ebx, %ebx";
+    static constexpr const char* EAX_ZERO = "xorl %eax, %eax";
+    static constexpr const char* EBX_ZERO = "xorl %ebx, %ebx";
 
     static constexpr const char* BYTE_TYPE = ".byte ";
     static constexpr const char* LONG_TYPE = ".long ";

@@ -141,18 +141,6 @@ int GenCode::generateDataVar(Tree * node) {
     if (!checkType(getType(node))) // get label variable
         return EXIT_SUCCESS;
 
-    if (checkSpec(getSpec(node))) { // get specific variable
-        if (getSpec(node) == specif.at(0)) {
-            // XXX: if you implement array initialization in tree, add here
-            //   generation of GAS code for array
-
-            return EXIT_SUCCESS; // because array can't be initialized
-        }
-        else { // const
-            return EXIT_SUCCESS;
-        }
-    }
-
     std::string val;
 
     if (node->GetLeftNode() != nullptr) {
@@ -191,23 +179,26 @@ int GenCode::generateBssVaar(Tree * node) {
     if (node->GetRightNode() == nullptr) {
         std::cerr << "<E> GenCode: Variable doesn't have a type node" << std::endl;
         return -EXIT_FAILURE;
-    }
-
-    if (!checkType(getType(node)))
-        return EXIT_SUCCESS;
+    }    
 
     if (node->GetLeftNode() != nullptr && !checkSpec(getSpec(node)))
         return EXIT_SUCCESS;
 
     std::string val;
+    std::string var; // save name of var
 
-    if (getSpec(node) == specif.at(0))
+    if (getType(node) == specif.at(0)) {
+        var = node->GetValue();
+        node = node->GetRightNode();
         val = getArraySize(node->GetLeftNode(), getType(node));
-    else
+    }
+    else {
+        var = node->GetValue();
         val = (getType(node) == types.at(0)) ? LONG_SIZE : BYTE_SIZE;
+    }
 
     std::string type = SPAC_TYPE;
-    generateLabel(node->GetValue(), type, val);
+    generateLabel(var, type, val);
     return EXIT_SUCCESS;
 }
 
@@ -363,22 +354,8 @@ int GenCode::generateCompound(Tree * node) {
                     addLine(str.data());
                 }
 
-                /****** operation goto *******/
             }
-            else if (node->GetLeftNode()->GetValue() == "goto") {
-                std::string str = "jmp " + node->GetLeftNode()->GetRightNode()->GetValue();
-                addLine(str.data());
-
-                /****** operation := *******/
-
-            }
-            else if (node->GetLeftNode()->GetValue() == ":=") {
-
-                if ((checkVariable(node->GetLeftNode()->GetLeftNode()->GetValue())) ==
-                    nullptr) { //if undefined variable
-                    throw std::out_of_range("undefined variable");
-                }
-
+            else if (node->GetLeftNode()->GetValue() == ":=") {                     
                 if (node->GetLeftNode()->GetRightNode()->GetLeftNode() ==
                     nullptr) { //for d:=1 optimization(d:=value)
 
@@ -388,7 +365,14 @@ int GenCode::generateCompound(Tree * node) {
                     if (node->GetLeftNode()->GetRightNode()->GetValue() == "true") str += "1";
                     else if (node->GetLeftNode()->GetRightNode()->GetValue() == "false") str += "0";
                     else str += node->GetLeftNode()->GetRightNode()->GetValue();
-                    str += ", " + node->GetLeftNode()->GetLeftNode()->GetValue();
+
+                    if (node->GetLeftNode()->GetLeftNode()->GetValue() == specif.at(0)) {
+                        str += ", " + node->GetLeftNode()->GetLeftNode()->GetLeftNode()->GetValue();
+                        stringstream memindex;
+                        memindex << 4 * stoi(node->GetLeftNode()->GetLeftNode()->GetRightNode()->GetValue());
+                        str += " + " + memindex.str();
+                    } else 
+                        str += ", " + node->GetLeftNode()->GetLeftNode()->GetValue();
 
                     addLine(str.data());
 
@@ -397,10 +381,18 @@ int GenCode::generateCompound(Tree * node) {
 
                     generateExpressions(node->GetLeftNode()->GetRightNode());
                     addLine("popl %eax");
-                    std::string str = "movl %eax, " + node->GetLeftNode()->GetLeftNode()->GetValue();
+                    std::string str = "movl %eax, ";
+                    if (node->GetLeftNode()->GetLeftNode()->GetValue() == specif.at(0)) {
+                        str += node->GetLeftNode()->GetLeftNode()->GetLeftNode()->GetValue();
+                        stringstream memindex;
+                        memindex << 4 * stoi(node->GetLeftNode()->GetLeftNode()->GetRightNode()->GetValue());
+                        str += " + " + memindex.str();
+                    }
+                    else
+                        str += node->GetLeftNode()->GetLeftNode()->GetValue();
                     addLine(str.data());
                 }
-
+                
                 /****** operation begin *******/
 
             }
@@ -445,7 +437,6 @@ void GenCode::generateExpressions(Tree * node) {
             if (node->GetValue() == "true") str += "1";
             else if (node->GetValue() == "false") str += "0";
             else str += node->GetValue();
-            str += node->GetValue();
             addLine(str.data());
 
         }
@@ -464,11 +455,27 @@ void GenCode::generateExpressions(Tree * node) {
 
         return;
     }
-
-    if (node->GetLeftNode() != nullptr)
+    // for d:= arr[i] + ...
+    if (node->GetLeftNode()->GetValue() == specif.at(0)) {
+        
+        std::string str = "pushl ";
+        str += node->GetLeftNode()->GetLeftNode()->GetValue();
+        stringstream memindex;
+        memindex << 4 * stoi(node->GetLeftNode()->GetRightNode()->GetValue());
+        str += " + " + memindex.str();
+        addLine(str.data());
+    } else if (node->GetLeftNode() != nullptr)
         generateExpressions(node->GetLeftNode());
 
-    if (node->GetRightNode() != nullptr)
+    // for d:= ... + arr[i]
+    if (node->GetRightNode()->GetValue() == specif.at(0)) {
+        std::string str = "pushl ";
+        str += node->GetRightNode()->GetLeftNode()->GetValue();
+        stringstream memindex;
+        memindex << 4 * stoi(node->GetRightNode()->GetRightNode()->GetValue());
+        str += " + " + memindex.str();
+        addLine(str.data());
+    } else if (node->GetRightNode() != nullptr)
         generateExpressions(node->GetRightNode());
 
     if (node->GetRightNode() != nullptr) {

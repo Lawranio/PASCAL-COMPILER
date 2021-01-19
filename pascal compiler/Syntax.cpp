@@ -363,7 +363,7 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
 
             tree_exp = Tree::CreateNode(t_iter->GetName());
             getPrevLex(t_iter);
-            tree_exp->AddLeftNode("_array");
+            tree_exp->AddLeftNode("array");
             tree_exp->GetLeftNode()->AddLeftNode(var_iter->GetName(), 0);
             tree_exp->GetLeftNode()->AddRightNode(getPrevLex(t_iter)->GetName());
             t_iter = save_ass;
@@ -430,16 +430,28 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
         auto var_iter = getNextLex(t_iter);
         result_tree = tree_exp;
 
+        if (var_iter->GetToken() == break_tk) {
+            then_exp->AddLeftNode("break");
+            then_exp->GetLeftNode()->AddRightNode(breakpoint);
+            getNextLex(var_iter);
+        }
+
         if ((var_iter->GetToken() == id_tk) || (var_iter->GetToken() == begin_tk)
             || (var_iter->GetToken() == for_tk) || (var_iter->GetToken() == if_tk)) {
             var_iter = getPrevLex(var_iter);
             result_tree->GetRightNode()->AddLeftTree(stateParse(var_iter, c_count));
-            //var_iter->GetName();
         }
+
 
         if (var_iter->GetToken() == else_tk || getNextLex(var_iter)->GetToken() == else_tk) {
             then_exp->AddRightNode("else");
             getNextLex(var_iter);
+
+            if (var_iter->GetToken() == break_tk) {
+                then_exp->GetRightNode()->AddLeftNode("break");
+                then_exp->GetRightNode()->GetLeftNode()->AddRightNode(breakpoint);
+            }
+
             if ((var_iter->GetToken() == id_tk) || (var_iter->GetToken() == begin_tk)
                 || (var_iter->GetToken() == for_tk) || (var_iter->GetToken() == if_tk)) {
                 var_iter = getPrevLex(var_iter);
@@ -517,6 +529,7 @@ Tree* Syntax::compoundParse(lex_it& t_iter, int c_count) {
         }
         if (t_iter->GetToken() != dot_tk)
         {
+            if (checkLexem(peekLex(1, t_iter), for_tk)) { breakpoint = label(); };
             auto *subTree = stateParse(t_iter, c_count);
             if (subTree != nullptr) {
                 tree->AddRightNode(label());
@@ -565,7 +578,7 @@ int Syntax::expressionParse(lex_it& t_iter, Tree *tree, int t_lvl) {
                 return -EXIT_FAILURE;
             }
             t_iter = iter;
-            auto var_tree = Tree::CreateNode("_array");
+            auto var_tree = Tree::CreateNode("array");
             var_tree->AddLeftNode(var_iter->GetName());
             var_tree->AddRightNode(getPrevLex(iter)->GetName());
             subTree = simplExprParse(var_tree, t_iter, tree, t_lvl);

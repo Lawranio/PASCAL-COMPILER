@@ -363,7 +363,7 @@ Tree* Syntax::stateParse(lex_it& t_iter, int c_count) {
 
             tree_exp = Tree::CreateNode(t_iter->GetName());
             getPrevLex(t_iter);
-            tree_exp->AddLeftNode("_array");
+            tree_exp->AddLeftNode("array");
             tree_exp->GetLeftNode()->AddLeftNode(var_iter->GetName(), 0);
             tree_exp->GetLeftNode()->AddRightNode(getPrevLex(t_iter)->GetName());
             t_iter = save_ass;
@@ -510,7 +510,7 @@ Tree* Syntax::compoundParse(lex_it& t_iter, int c_count) {
     int sec_prm = 0;
 
     auto label = [&]() -> std::string {
-        return "_*op" + std::to_string(local_lvl) + "." +
+        return "_op" + std::to_string(local_lvl) + "." +
             std::to_string(sec_prm);
     };
 
@@ -578,7 +578,7 @@ int Syntax::expressionParse(lex_it& t_iter, Tree *tree, int t_lvl) {
                 return -EXIT_FAILURE;
             }
             t_iter = iter;
-            auto var_tree = Tree::CreateNode("_array");
+            auto var_tree = Tree::CreateNode("array");
             var_tree->AddLeftNode(var_iter->GetName());
             var_tree->AddRightNode(getPrevLex(iter)->GetName());
             subTree = simplExprParse(var_tree, t_iter, tree, t_lvl);

@@ -2,14 +2,12 @@ program kekw;
 var
 	a, b: integer;
 	e: integer;
+	c: array [0..3] of integer;
 begin
-	for a := 2 to 7 do b := a + 1;
-
-	e := 2;
-	
-	for b := 1 downto 10 do begin
-		a := 25;
-		if 2 >= 5 then break;
-		else b := 1 + 3;
+	b := 1;
+	for a := 1 to 3 do begin
+			if a <  3 then b := a * a;
+				else e := b * 10;
 	end;
+	
 end.          

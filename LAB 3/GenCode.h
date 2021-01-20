@@ -19,6 +19,7 @@ private:
     std::ofstream code;
     std::ostringstream test_str;
     size_t num_if{ 0 };
+    size_t num_for{ 0 };
     std::string path;
 
     const std::array<std::string, 2> types = { "integer", "boolean" };
@@ -32,8 +33,8 @@ private:
     static constexpr const char* MAIN_SECT = "_main:";
     static constexpr const char* RET_SECT = "ret";
 
-    static constexpr const char* EAX_ZERO = "xor1 %eax, %eax";
-    static constexpr const char* EBX_ZERO = "xor1 %ebx, %ebx";
+    static constexpr const char* EAX_ZERO = "xorl %eax, %eax";
+    static constexpr const char* EBX_ZERO = "xorl %ebx, %ebx";
 
     static constexpr const char* BYTE_TYPE = ".byte ";
     static constexpr const char* LONG_TYPE = ".long ";
@@ -53,13 +54,13 @@ private:
     void generateTextPart();
     void generateExpressions(Tree* node);
     void addLine(std::string&& code_line);
+    void addSpace();
     void buildLine(std::string&& code_line);
 
     void generateLabel(const std::string& name, const std::string& type,
         const std::string& val);
     void generateEnd();
     void clearBuffer();
-    void generateConstVars(Tree* var_root);
 
 
     std::string getType(Tree* node);

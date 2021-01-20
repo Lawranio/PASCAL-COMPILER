@@ -262,14 +262,63 @@ int GenCode::generateCompound(Tree * node) {
 
             
             if (node->GetLeftNode()->GetValue() == "for") {
-                auto ptr = node->GetLeftNode(); //ptr = *for
-
                 num_for++;
                 auto num = num_for;
+
+                auto ptr = node->GetLeftNode();//ptr = *for;
+                auto var = node->GetLeftNode()->GetLeftNode()->GetLeftNode()->GetLeftNode()->GetValue();
+                auto value1 = ptr->GetLeftNode()->GetLeftNode()->GetRightNode()->GetValue(); //value before 'to'
+                auto value2 = ptr->GetLeftNode()->GetRightNode()->GetValue(); //value after 'to'
                 std::string str;
+                std::string loop_label;
 
+                addLine("xorl %eax, %eax"); // eax = 0
+                str = "movl $";
+                str += value2;
+                str += ", %ecx";
+                addLine(str.data());
+                addLine(" ");
 
+                str = "loop_m_";
+                str += std::to_string(num);
+                loop_label = "loop ";
+                loop_label += str;
+                str += ":";
+                addLine(str.data());
 
+                addLine(" ");
+
+                if (ptr->GetRightNode()->GetValue() == "begin" ||
+                    ptr->GetRightNode()->GetValue() == "for" ||
+                    ptr->GetRightNode()->GetValue() == "if") {
+
+                    node = ptr->GetRightNode()->GetRightNode();
+                    generateCompound(node);
+                    addLine(" ");
+                }
+
+                if (ptr->GetRightNode()->GetValue() == ":=") {
+                    if (ptr->GetRightNode()->GetRightNode()->GetLeftNode() == nullptr) { //for d:=1 optimization(d:=value)
+                        str = "movl ";
+                        (checkVariable(ptr->GetRightNode()->GetRightNode()->GetValue()) == nullptr) ? str += "$" : "";
+                        str += ptr->GetRightNode()->GetRightNode()->GetValue() += ", ";
+                        str += ptr->GetRightNode()->GetLeftNode()->GetValue();
+                        addLine(str.data());
+                        addLine(" ");
+                    }
+                    else {
+                        generateExpressions(ptr->GetRightNode()->GetRightNode());
+                        addLine("popl %eax");
+                        str = "movl %eax, " + ptr->GetRightNode()->GetLeftNode()->GetValue();
+                        addLine(str.data());
+                        addLine(" ");
+                    }
+                }
+
+                if (node->GetValue() == "end") { node = node->GetRightNode()->GetRightNode(); };
+                if (node->GetRightNode()->GetValue() == "end") { node = node->GetRightNode(); };
+
+                addLine(loop_label.data());
 
             }
             else if (node->GetLeftNode()->GetValue() == "if") { //operator if
@@ -414,7 +463,10 @@ int GenCode::generateCompound(Tree * node) {
 
             addLine(" ");
             addLine(st_end.data()); // print end label
-            node = node->GetRightNode();
+            if (node->GetValue() == "end")
+                break;
+            else
+                node = node->GetRightNode();
         }
 
         return EXIT_SUCCESS;

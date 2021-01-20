@@ -19,7 +19,8 @@ private:
     std::ofstream code;
     std::ostringstream test_str;
     size_t num_if{ 0 };
-    std::string path;
+    size_t num_for{ 0 };
+    std::string breakpoint;
 
     const std::array<std::string, 2> types = { "integer", "boolean" };
     const std::array<std::string, 2> specif = { "array", "const" };
@@ -54,6 +55,7 @@ private:
     void generateExpressions(Tree* node);
     void addLine(std::string&& code_line);
     void buildLine(std::string&& code_line);
+    void addSpace();
 
     void generateLabel(const std::string& name, const std::string& type,
         const std::string& val);

@@ -510,7 +510,7 @@ Tree* Syntax::compoundParse(lex_it& t_iter, int c_count) {
     int sec_prm = 0;
 
     auto label = [&]() -> std::string {
-        return "_*op" + std::to_string(local_lvl) + "." +
+        return "_op" + std::to_string(local_lvl) + "." +
             std::to_string(sec_prm);
     };
 

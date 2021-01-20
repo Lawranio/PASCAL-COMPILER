@@ -95,13 +95,18 @@ int GenCode::generateDeclVars() {
         return -EXIT_FAILURE;
     }
 
+    if (ptr->GetRightNode()->GetLeftNode()->GetLeftNode() != nullptr)
+        addLine(DATA_SECT);    
+    else 
+        addLine(BSS_SECT);
+
     while (ptr->GetRightNode() != nullptr) {
 
         if (ptr->GetLeftNode()->GetLeftNode() != nullptr) { //if initialized variable
             generateDataVar(ptr->GetLeftNode());
 
             if (!test_str.str().empty()) { // if we have any initialized variables
-                addLine(DATA_SECT);
+                //addLine(DATA_SECT);
                 addLine(test_str.str());
                 clearBuffer();
             }
@@ -111,8 +116,9 @@ int GenCode::generateDeclVars() {
 
             generateBssVaar(ptr->GetLeftNode());
 
+            
             if (!test_str.str().empty()) { // if we have any uninitialized variables
-                addLine(BSS_SECT);
+                //addLine(BSS_SECT);
                 addLine(test_str.str());
                 clearBuffer();
             }
@@ -204,21 +210,6 @@ int GenCode::generateBssVaar(Tree * node) {
 
 
 /**
- * @brief Generate GAS code for constant variables
- * @param[in] var_root - pointer to the root of subtree of variables
- *
- * @return none
- * @note Work for code like:
- *   const a : integer = 5;
- *   const b = 1;
- *   const c : boolean = false;
- */
-void GenCode::generateConstVars(Tree * var_root) {
-    // for .set variables
-}
-
-
-/**
  * @brief Generate GAS code for code section (right node from root)
  * @param none
  *
@@ -253,9 +244,14 @@ int GenCode::generateCompound(Tree * node) {
             if (node->GetValue() == "end" || node->GetValue() == "end.")
                 return EXIT_SUCCESS;
 
-            std::string st = node->GetValue() + ":";//print label
+            std::string st = node->GetValue(); //print start label
+            std::string st_end = st;
+            st += ":";
             addLine(st.data());
             addLine(" ");
+            
+            st_end += "_end:";
+            breakpoint = st_end;
 
             /*** if we have empty label in tree*///
 
@@ -264,8 +260,19 @@ int GenCode::generateCompound(Tree * node) {
                 continue;
             }
 
-            /****** operation if *******/
-            if (node->GetLeftNode()->GetValue() == "if") { //operator if
+            
+            if (node->GetLeftNode()->GetValue() == "for") {
+                auto ptr = node->GetLeftNode(); //ptr = *for
+
+                num_for++;
+                auto num = num_for;
+                std::string str;
+
+
+
+
+            }
+            else if (node->GetLeftNode()->GetValue() == "if") { //operator if
                 auto ptr = node->GetLeftNode();//ptr = *if
 
                 if (ptr->GetLeftNode() == nullptr) {
@@ -405,6 +412,8 @@ int GenCode::generateCompound(Tree * node) {
             }
             else throw std::out_of_range("need some end for begin");
 
+            addLine(" ");
+            addLine(st_end.data()); // print end label
             node = node->GetRightNode();
         }
 
@@ -843,8 +852,8 @@ void GenCode::generateThenElseExpr(Tree * node) {
         /*** goto in if ***/
 
     }
-    else if (node->GetLeftNode()->GetValue() == "goto") {
-        std::string str = "jmp " + node->GetLeftNode()->GetRightNode()->GetValue();
+    else if (node->GetLeftNode()->GetValue() == "break") {
+    std::string str = "jmp " + breakpoint;
         addLine(str.data());
     }
     else if (node->GetLeftNode()->GetValue() == "begin") {

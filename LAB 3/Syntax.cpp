@@ -530,6 +530,7 @@ Tree* Syntax::compoundParse(lex_it& t_iter, int c_count) {
         if (t_iter->GetToken() != dot_tk)
         {
             if (checkLexem(peekLex(1, t_iter), for_tk)) { breakpoint = label(); };
+            //if (checkLexem(peekLex(1, t_iter), if_tk)) { breakpoint = label(); };
             auto *subTree = stateParse(t_iter, c_count);
             if (subTree != nullptr) {
                 tree->AddRightNode(label());

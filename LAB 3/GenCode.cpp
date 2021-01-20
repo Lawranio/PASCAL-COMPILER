@@ -253,6 +253,7 @@ int GenCode::generateCompound(Tree * node) {
             if (node->GetValue() == "end" || node->GetValue() == "end.")
                 return EXIT_SUCCESS;
 
+
             std::string st = node->GetValue() + ":";//print label
             addLine(st.data());
             addSpace();
@@ -267,86 +268,41 @@ int GenCode::generateCompound(Tree * node) {
             /****** operations if, for *******/
             if (node->GetLeftNode()->GetValue() == "for") {
                 num_for++;
+                auto num = num_for;
+
                 auto ptr = node->GetLeftNode();//ptr = *for;
                 auto var = node->GetLeftNode()->GetLeftNode()->GetLeftNode()->GetLeftNode()->GetValue();
-                auto value1 = ptr->GetLeftNode()->GetLeftNode()->GetRightNode()->GetValue();
-                auto value2 = ptr->GetLeftNode()->GetRightNode()->GetValue();
+                auto value1 = ptr->GetLeftNode()->GetLeftNode()->GetRightNode()->GetValue(); //value before 'to'
+                auto value2 = ptr->GetLeftNode()->GetRightNode()->GetValue(); //value after 'to'
+                std::string str;
+                std::string loop_label;
 
-                /***** after 'to' or 'downto' value addition ******/
-                std::string str = "movl $";
+                addLine("xorl %eax, %eax"); // eax = 0
+                str = "movl $";
                 str += value2;
                 str += ", %ecx";
                 addLine(str.data());
-
-                /***** before 'to' or 'downto' value addition via var *****/
-                str = "movl $";
-                str += value1;
-                str += ", ";
-                str += var;
-                addLine(str.data());
-
-                /***** generate label *****/
-                addSpace();
-                str = "loop_";
-                str += std::to_string(num_for) += ":";
-                addLine(str.data());
                 addSpace();
 
-                /***** loop condition check *****/
-                if (ptr->GetLeftNode()->GetValue() == "to") {   // if 'to'
-                    str = "movl ";
-                    str += var;
-                    str += ", %eax";
-                    addLine(str.data());
+                str = "loop_m_";
+                str += std::to_string(num);
+                loop_label = "loop ";
+                loop_label += str;
+                str += ":";
+                addLine(str.data());
 
-                    str = "addl $1, %eax";
-                    addLine(str.data());
+                addSpace();
+                
+                if (ptr->GetRightNode()->GetValue() == "begin" ||
+                    ptr->GetRightNode()->GetValue() == "for" ||
+                    ptr->GetRightNode()->GetValue() == "if") {
 
-                    str = "movl %eax, ";
-                    str += var;
-                    addLine(str.data());
-                    addSpace();
-
-                    str = "cmpl %eax, %ecx";
-                    addLine(str.data());
-
-                    str = "jg ";
-                    str += "loop_";
-                    str += std::to_string(num_for);
-                    addLine(str.data());
-                    addSpace();
-                }
-                else {  // if 'downto'
-                    str = "movl ";
-                    str += var;
-                    str += ", %eax";
-                    addLine(str.data());
-
-                    str = "subl $1, %eax";
-                    addLine(str.data());
-
-                    str = "movl %eax, ";
-                    str += var;
-                    addLine(str.data());
-                    addSpace();
-
-                    str = "cmpl %ecx, %eax";
-                    addLine(str.data());
-
-                    str = "jg ";
-                    str += "loop_";
-                    str += std::to_string(num_for);
-                    addLine(str.data());
-                }
-
-                if (ptr->GetRightNode()->GetValue() == "begin" 
-                    || ptr->GetRightNode()->GetValue() == "for"
-                    || ptr->GetRightNode()->GetValue() == "if") {
                     node = ptr->GetRightNode()->GetRightNode();
                     generateCompound(node);
                     addSpace();
                 }
-                else {
+
+                if (ptr->GetRightNode()->GetValue() == ":=") {
                     if (ptr->GetRightNode()->GetRightNode()->GetLeftNode() == nullptr) { //for d:=1 optimization(d:=value)
                         str = "movl ";
                         (checkVariable(ptr->GetRightNode()->GetRightNode()->GetValue()) == nullptr) ? str += "$" : "";
@@ -363,8 +319,13 @@ int GenCode::generateCompound(Tree * node) {
                         addSpace();
                     }
                 }
-                
-                node = node->GetRightNode();
+
+                if (node->GetValue() == "end") { node = node->GetRightNode()->GetRightNode(); };
+                if (node->GetRightNode()->GetValue() == "end") { node = node->GetRightNode(); };
+                if (node->GetRightNode()->GetRightNode()->GetValue() == "end") { node = node->GetRightNode()->GetRightNode(); };
+
+                addLine(loop_label.data());
+
             }
             else if (node->GetLeftNode()->GetValue() == "if") { //operator if
                 auto ptr = node->GetLeftNode();//ptr = *if
@@ -453,12 +414,6 @@ int GenCode::generateCompound(Tree * node) {
                 /****** operation goto *******/
             }
             else if (node->GetLeftNode()->GetValue() == ":=") {
-
-                if ((checkVariable(node->GetLeftNode()->GetLeftNode()->GetValue())) ==
-                    nullptr) { //if undefined variable
-                    throw std::out_of_range("undefined variable");
-                }
-
                 if (node->GetLeftNode()->GetRightNode()->GetLeftNode() ==
                     nullptr) { //for d:=1 optimization(d:=value)
 
@@ -800,12 +755,6 @@ void GenCode::generateThenElseExpr(Tree * node) {
 
     /*** := in if ***/
     if (node->GetLeftNode()->GetValue() == ":=") {
-
-        if (checkVariable((node->GetLeftNode()->GetLeftNode()->GetValue())) ==
-            nullptr) {//if undefined variable
-            throw std::out_of_range("undefined variable");
-        }
-
         //node->GetLeftNode() -- *:=
 
         if (node->GetLeftNode()->GetRightNode()->GetLeftNode() ==
@@ -922,7 +871,7 @@ void GenCode::generateThenElseExpr(Tree * node) {
         /*** goto in if ***/
 
     }
-    else if (node->GetLeftNode()->GetValue() == "goto") {
+    else if (node->GetLeftNode()->GetValue() == "break") {
         std::string str = "jmp " + node->GetLeftNode()->GetRightNode()->GetValue();
         addLine(str.data());
     }

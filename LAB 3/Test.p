@@ -1,13 +1,17 @@
 program kekw;
 var
-	a, b: integer;
-	e: integer;
-	c: array [0..3] of integer;
+a, b, c : integer; 
+d: integer;
+
 begin
-	b := 1;
-	for a := 1 to 3 do begin
-			if a <  3 then b := a * a;
-				else e := b * 10;
-	end;
-	
-end.          
+
+a := 10;
+b := 1;
+d := 0;
+a := b + d;
+for c := 0 to 4 do begin
+    b := 1 + c; 
+    if b > 3 then a:= 2225;
+    else d := d + 10;
+end;
+end.           

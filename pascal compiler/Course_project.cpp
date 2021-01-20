@@ -14,8 +14,8 @@ int Compile(const std::string& file_path) {
 		return -EXIT_FAILURE;
 	}
 
-	GenCode gencod(std::move(*tree));
-	gencod.GenerateAsm(); // final code file
+	//GenCode gencod(std::move(*tree));
+	//gencod.GenerateAsm(); // final code file
 
 	return EXIT_SUCCESS;
 }

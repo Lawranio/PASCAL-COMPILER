@@ -265,6 +265,8 @@ int GenCode::generateCompound(Tree * node) {
                 num_for++;
                 auto num = num_for;
 
+                auto ptrNextOp = node->GetRightNode();
+                if (ptrNextOp->GetValue() == "end.") ptrNextOp = nullptr;
                 auto ptr = node->GetLeftNode();//ptr = *for;
                 auto var = node->GetLeftNode()->GetLeftNode()->GetLeftNode()->GetLeftNode()->GetValue();
                 auto value1 = ptr->GetLeftNode()->GetLeftNode()->GetRightNode()->GetValue(); //value before 'to'
@@ -315,8 +317,16 @@ int GenCode::generateCompound(Tree * node) {
                     }
                 }
 
-                if (node->GetValue() == "end") { node = node->GetRightNode()->GetRightNode(); };
+                while (node->GetRightNode()->GetValue() != "end") {
+                    if (ptrNextOp != nullptr) break;
+                    if (node->GetValue() == "end.") break;
+                    node = node->GetRightNode();
+                }
+                /*if (node->GetRightNode()->GetRightNode()->GetValue() == "end" && node->GetRightNode()->GetRightNode() == nullptr) { node = node->GetRightNode()->GetRightNode(); };
                 if (node->GetRightNode()->GetValue() == "end") { node = node->GetRightNode(); };
+                if (node->GetValue() == "end") { node = node->GetRightNode()->GetRightNode(); };*/
+                
+                //if (ptrNextOp != nullptr) node = ptrNextOp;
 
                 addLine(loop_label.data());
 
@@ -463,7 +473,7 @@ int GenCode::generateCompound(Tree * node) {
 
             addLine(" ");
             addLine(st_end.data()); // print end label
-            if (node->GetValue() == "end")
+            if (node->GetValue() == "end" || node->GetValue() == "end.")
                 break;
             else
                 node = node->GetRightNode();

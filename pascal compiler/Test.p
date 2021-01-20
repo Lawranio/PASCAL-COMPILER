@@ -1,15 +1,18 @@
-program lab;
-    var
-        b: array [1..5] of integer;
-        e, a: integer;
+program kekw;
+var
+a, b, c: integer; 
+d: integer;
+
 begin
-	for a := 1 downto 5 do
-	   e := e + a;
-	   for a := 1 to 5 do
-	      a := 1;
-	
-	b[2] := e + a - 1 * (5 + 4);
-	begin
-	   b[3] := b[4] + b[5];
+
+a := 10;
+d := 0;
+b := 0;
+c := b * 10;
+
+if a > 2 then begin
+	if b < 1 then c := 1;
 	end;
+end;
+end;
 end.           

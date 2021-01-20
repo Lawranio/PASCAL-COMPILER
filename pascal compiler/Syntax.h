@@ -23,7 +23,6 @@ private:
 	Tree							*root_tree;
 	bool							error{ false };
 	std::string						breakpoint;
-	std::string						ZAEBALO;
 
 	std::map<std::string, int> operations;
 

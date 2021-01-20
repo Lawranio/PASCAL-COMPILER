@@ -620,10 +620,6 @@ int Syntax::expressionParse(lex_it& t_iter, Tree *tree, int t_lvl) {
             t_iter = getPrevLex(iter);
             lex_table.erase(getNextLex(iter));
             getPrevLex(t_iter);
-            if (getPrevLex(t_iter)->GetToken() == osb_tk) {
-                getPrevLex(t_iter);
-                getPrevLex(t_iter);
-            }
             expressionParse(t_iter, tree, t_lvl);
         }
         else {

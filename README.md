@@ -4,7 +4,7 @@
   * if in if (optional)
 * сode generator
   * ~~array decl~~
-  * for, for in for  !!!!!!!!!!!
+  * complex structures in GenCode
   * ~~break~~
   * ~~array expressions~~
 

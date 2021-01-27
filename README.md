@@ -1,7 +1,7 @@
 # ABOUT
 
 Contains C++ sources for Pascal compiler.
-Pascal program as an input data and Assembler code as an output data
+Pascal program (.p file) as an input data and Assembler code (.s file) as an output data
 
 # STRUCTURE
 

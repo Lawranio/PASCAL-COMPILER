@@ -7,7 +7,7 @@ Compiler doesn't operate very well.
 # PARTICIPANTS
 
 * Also contributed by [MikhailMartusevich](https://github.com/MikhailMartusevich)
-* Core code provided by https://github.com/GOOD-Stuff
+* Core code provided by [GOOD-Stuff](https://github.com/GOOD-Stuff)
 
 # STRUCTURE
 
